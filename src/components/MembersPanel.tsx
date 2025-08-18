@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Modal } from '@/components/ui/modal'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Availability, Member } from '@/types'
 import { INSTRUMENTS, instrumentLabelForKey } from '@/lib/instruments'
 
@@ -43,6 +44,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
   const [eAvailability, setEAvailability] = useState<Availability>('both')
   const [eTarget, setETarget] = useState<number>(2)
   const [eCanSingAndPlay, setECanSingAndPlay] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState<Member | null>(null)
 
   function addMember() {
     if (!canAddMember) return
@@ -165,7 +167,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                   <span>Assigned: {mAssigned(m)}</span>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => onRemove(m.id)}><Trash2 className="w-4 h-4"/></Button>
+              <Button variant="ghost" size="icon" onClick={() => setConfirmRemove(m)}><Trash2 className="w-4 h-4"/></Button>
               <Button variant="secondary" size="icon" onClick={() => openEdit(m)}><Edit2 className="w-4 h-4"/></Button>
             </div>
           ))}
@@ -221,6 +223,20 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
           )}
         </Modal>
       </CardContent>
+      <ConfirmDialog
+        open={!!confirmRemove}
+        onOpenChange={(o) => !o && setConfirmRemove(null)}
+        title="Remove member?"
+        description={confirmRemove ? (<span>Are you sure you want to remove <strong>{confirmRemove.name}</strong>? This cannot be undone.</span>) : undefined}
+        confirmLabel="Delete"
+        confirmVariant="destructive"
+        onConfirm={() => {
+          if (confirmRemove) {
+            onRemove(confirmRemove.id)
+            setConfirmRemove(null)
+          }
+        }}
+      />
     </Card>
   )
 }

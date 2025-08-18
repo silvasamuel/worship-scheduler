@@ -2,12 +2,12 @@ import React, { useState, useRef } from 'react'
 import { Plus, CalendarPlus, Music, Trash2, Wand2, Info } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Schedule, AssignmentSlot, Member } from '@/types'
 import { INSTRUMENTS, instrumentLabelForKey } from '@/lib/instruments'
 import { dayLabel } from '@/lib/date'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 type Props = {
   schedules: Schedule[]
@@ -26,6 +26,7 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
   const [showAddScheduleTip, setShowAddScheduleTip] = useState(false)
   const [scheduleTipPlacement, setScheduleTipPlacement] = useState<'top' | 'bottom'>('top')
   const addScheduleWrapperRef = useRef<HTMLSpanElement | null>(null)
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null)
 
   function addSchedule() {
     if (!canAddSchedule) return
@@ -136,7 +137,7 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
                 <div className="font-semibold">{dayLabel(s.date)}</div>
                 <Badge className={s.status === 'complete' ? 'bg-green-600' : s.status === 'partial' ? 'bg-amber-500' : 'bg-gray-400'}>{s.status}</Badge>
                 <div className="ml-auto flex items-center gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => onRemoveSchedule(s.id)}><Trash2 className="w-4 h-4"/></Button>
+                  <Button variant="ghost" size="icon" onClick={() => setConfirmRemoveId(s.id)}><Trash2 className="w-4 h-4"/></Button>
                 </div>
               </div>
 
@@ -175,6 +176,20 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
             <Button onClick={autoFill} className="gap-2"><Wand2 className="w-4 h-4"/>Auto‑Fill Schedules</Button>
           </div>
         )}
+        <ConfirmDialog
+          open={!!confirmRemoveId}
+          onOpenChange={(o) => !o && setConfirmRemoveId(null)}
+          title="Remove schedule?"
+          description={confirmRemoveId ? 'Are you sure you want to remove this schedule? This cannot be undone.' : undefined}
+          confirmLabel="Delete"
+          confirmVariant="destructive"
+          onConfirm={() => {
+            if (confirmRemoveId) {
+              onRemoveSchedule(confirmRemoveId)
+              setConfirmRemoveId(null)
+            }
+          }}
+        />
       </CardContent>
     </Card>
   )
