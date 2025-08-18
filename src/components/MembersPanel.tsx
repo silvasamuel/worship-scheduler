@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Plus, Trash2, Edit2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -32,6 +32,10 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
   const [mAvailability, setMAvailability] = useState<Availability | ''>('')
   const [mTargetCount, setMTargetCount] = useState<number | ''>('')
   const [mCanSingAndPlay, setMCanSingAndPlay] = useState(false)
+  const canAddMember = Boolean(mName.trim()) && mInstruments.length > 0
+  const [showAddMemberTip, setShowAddMemberTip] = useState(false)
+  const [memberTipPlacement, setMemberTipPlacement] = useState<'top' | 'bottom'>('top')
+  const addMemberWrapperRef = useRef<HTMLSpanElement | null>(null)
 
   const [editing, setEditing] = useState<Member | null>(null)
   const [eInstruments, setEInstruments] = useState<string>('')
@@ -41,10 +45,25 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
   const [eCanSingAndPlay, setECanSingAndPlay] = useState(false)
 
   function addMember() {
-    if (!mName.trim()) return
+    if (!canAddMember) return
     const instruments = Array.from(new Set(mInstruments.map((x) => x.trim()).filter(Boolean))).map((x) => x.toLowerCase())
     onAdd({ name: mName.trim(), instruments, availability: (mAvailability || 'both') as Availability, targetCount: Math.max(0, Number(mTargetCount || 2) | 0), canSingAndPlay: mCanSingAndPlay })
     setMName(''); setMInstruments([]); setMAvailability(''); setMTargetCount(''); setMCanSingAndPlay(false)
+  }
+
+  function maybeShowMemberTooltip(e: React.MouseEvent) {
+    if (canAddMember) return
+    e.preventDefault()
+    e.stopPropagation()
+    const el = addMemberWrapperRef.current
+    if (el) {
+      const rect = el.getBoundingClientRect()
+      setMemberTipPlacement(rect.top < 40 ? 'bottom' : 'top')
+    } else {
+      setMemberTipPlacement('top')
+    }
+    setShowAddMemberTip(true)
+    window.setTimeout(() => setShowAddMemberTip(false), 1800)
   }
 
   function openEdit(m: Member) {
@@ -111,7 +130,25 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
           </div>
         </div>
 
-        <Button onClick={addMember} className="gap-2"><Plus className="w-4 h-4"/>Add Member</Button>
+        <span ref={addMemberWrapperRef} className="relative inline-block" onClick={maybeShowMemberTooltip}>
+          <Button
+            onClick={addMember}
+            disabled={!canAddMember}
+            title={!canAddMember ? 'Enter a name and select at least one instrument to add a member' : undefined}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4"/>Add Member
+          </Button>
+          {!canAddMember && showAddMemberTip && (
+            <span
+              role="tooltip"
+              className={`pointer-events-none absolute z-30 rounded-md bg-gray-900 text-white text-xs px-2 py-1 shadow-lg border border-white/10 whitespace-nowrap ${memberTipPlacement === 'top' ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' : 'top-full mt-2 left-1/2 -translate-x-1/2'}`}
+            >
+              Enter a name and select at least one instrument
+              <span className={`absolute w-2 h-2 bg-gray-900 rotate-45 border border-white/10 ${memberTipPlacement === 'top' ? 'top-full left-1/2 -translate-x-1/2 -mt-px' : 'bottom-full left-1/2 -translate-x-1/2 -mb-px'}`}></span>
+            </span>
+          )}
+        </span>
 
         <div className="mt-4 space-y-2">
           {members.length === 0 && <p className="text-sm text-gray-500">No members yet. Add some above.</p>}
@@ -120,7 +157,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
               <div className="flex-1">
                 <div className="font-medium">{m.name}</div>
                 <div className="text-xs text-gray-600 flex flex-wrap gap-1 mt-1">
-                  {m.instruments.map((i) => (<Badge key={i} variant="secondary" className="rounded-full">{i}</Badge>))}
+                  {m.instruments.map((i) => (<Badge key={i} variant="secondary" className="rounded-full">{instrumentLabelForKey(i)}</Badge>))}
                 </div>
                 <div className="text-xs text-gray-500 mt-1 flex gap-2 items-center">
                   <Badge variant="outline" className="rounded-full">{availabilityLabel(m.availability)}</Badge>

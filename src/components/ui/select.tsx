@@ -70,7 +70,29 @@ export function Select({ value = '', onValueChange, valueLabel, children }: Sele
 export function SelectTrigger({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const ctx = React.useContext(SelectContext)
   return (
-    <div className={cn('relative', className)} {...props} onClick={() => ctx?.setOpen(!ctx.open)}>
+    <div
+      className={cn('relative rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 ring-offset-white', className)}
+      role="button"
+      aria-haspopup="listbox"
+      aria-expanded={!!ctx?.open}
+      tabIndex={0}
+      {...props}
+      onClick={() => ctx?.setOpen(!ctx.open)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          ctx?.setOpen(!ctx.open)
+        }
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          ctx?.setOpen(true)
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          ctx?.setOpen(false)
+        }
+      }}
+    >
       {children}
     </div>
   )
@@ -80,7 +102,7 @@ export function SelectValue({ placeholder }: { placeholder?: string }) {
   const ctx = React.useContext(SelectContext)
   const label = (ctx?.valueLabel && ctx.value) ? ctx.valueLabel : ctx?.getLabel(ctx?.value || '')
   return (
-    <div className="h-8 w-full rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-sm flex items-center text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+    <div className="h-9 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 flex items-center text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
       {ctx?.value ? (label ?? ctx.value) : (placeholder || 'Select')}
     </div>
   )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Plus, CalendarPlus, Music, Trash2, Wand2, Info } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Schedule, AssignmentSlot, Member } from '@/types'
-import { INSTRUMENTS } from '@/lib/instruments'
+import { INSTRUMENTS, instrumentLabelForKey } from '@/lib/instruments'
 import { dayLabel } from '@/lib/date'
 
 type Props = {
@@ -22,11 +22,45 @@ type Props = {
 export default function SchedulesPanel({ schedules, members, onAddSchedule, onRemoveSchedule, onSetAssign, autoFill, eligibleForSlot }: Props) {
   const [sDate, setSDate] = useState('')
   const [sInstruments, setSInstruments] = useState<string[]>([])
+  const canAddSchedule = Boolean(sDate) && sInstruments.length > 0
+  const [showAddScheduleTip, setShowAddScheduleTip] = useState(false)
+  const [scheduleTipPlacement, setScheduleTipPlacement] = useState<'top' | 'bottom'>('top')
+  const addScheduleWrapperRef = useRef<HTMLSpanElement | null>(null)
 
   function addSchedule() {
-    if (!sDate) return
+    if (!canAddSchedule) return
     onAddSchedule(sDate, sInstruments)
     setSDate(''); setSInstruments([])
+  }
+
+  function openDatePicker(e: React.MouseEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>) {
+    const input = e.currentTarget
+    const showPicker = (input as any).showPicker
+    if (typeof showPicker === 'function') {
+      try {
+        showPicker.call(input)
+      } catch {
+        // no-op
+      }
+    } else {
+      input.focus()
+    }
+  }
+
+  function maybeShowScheduleTooltip(e: React.MouseEvent) {
+    if (canAddSchedule) return
+    e.preventDefault()
+    e.stopPropagation()
+    const el = addScheduleWrapperRef.current
+    if (el) {
+      const rect = el.getBoundingClientRect()
+      // If there isn't enough space above, show below
+      setScheduleTipPlacement(rect.top < 40 ? 'bottom' : 'top')
+    } else {
+      setScheduleTipPlacement('top')
+    }
+    setShowAddScheduleTip(true)
+    window.setTimeout(() => setShowAddScheduleTip(false), 1800)
   }
 
   return (
@@ -47,12 +81,50 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
             })}
           </div>
           <div className="flex items-center justify-end gap-2 order-3 md:order-none shrink-0">
-            <Button variant="secondary" onClick={() => setSInstruments((prev) => prev.length === INSTRUMENTS.length ? [] : [...INSTRUMENTS])} className="gap-2 shrink-0">{sInstruments.length === INSTRUMENTS.length ? 'Unselect All' : 'Select All'}</Button>
+            <Button
+              variant="secondary"
+              onClick={() => setSInstruments((prev) => prev.length === INSTRUMENTS.length ? [] : [...INSTRUMENTS])}
+              className="gap-2 shrink-0"
+            >
+              <span className="grid">
+                <span className="col-start-1 row-start-1 whitespace-nowrap">
+                  {sInstruments.length === INSTRUMENTS.length ? 'Unselect All' : 'Select All'}
+                </span>
+                <span className="col-start-1 row-start-1 opacity-0 pointer-events-none select-none whitespace-nowrap">Unselect All</span>
+              </span>
+            </Button>
           </div>
 
           <div className="flex items-center justify-end gap-2 order-2 md:order-none shrink-0">
-            <div className="w-40"><Input type="date" value={sDate} onChange={(e) => setSDate(e.target.value)} /></div>
-            <Button onClick={addSchedule} className="gap-2 shrink-0"><Plus className="w-4 h-4"/>Add Schedule</Button>
+            <div className="w-40">
+              <input
+                type="date"
+                value={sDate}
+                onChange={(e) => setSDate(e.target.value)}
+                onFocus={openDatePicker}
+                onClick={openDatePicker}
+                className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <span ref={addScheduleWrapperRef} className="relative inline-block" onClick={maybeShowScheduleTooltip}>
+              <Button
+                onClick={addSchedule}
+                disabled={!canAddSchedule}
+                title={!canAddSchedule ? 'Select a date and at least one instrument to add a schedule' : undefined}
+                className="gap-2 shrink-0"
+              >
+                <Plus className="w-4 h-4"/>Add Schedule
+              </Button>
+              {!canAddSchedule && showAddScheduleTip && (
+                <span
+                  role="tooltip"
+                  className={`pointer-events-none absolute z-30 rounded-md bg-gray-900 text-white text-xs px-2 py-1 shadow-lg border border-white/10 whitespace-nowrap ${scheduleTipPlacement === 'top' ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' : 'top-full mt-2 left-1/2 -translate-x-1/2'}`}
+                >
+                  Select a date and at least one instrument
+                  <span className={`absolute w-2 h-2 bg-gray-900 rotate-45 border border-white/10 ${scheduleTipPlacement === 'top' ? 'top-full left-1/2 -translate-x-1/2 -mt-px' : 'bottom-full left-1/2 -translate-x-1/2 -mb-px'}`}></span>
+                </span>
+              )}
+            </span>
           </div>
         </div>
 
@@ -72,9 +144,9 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
                 {s.assignments.map((slot) => (
                   <div key={slot.id} className="flex items-center gap-2 bg-gray-50 rounded-xl p-2">
                     <Music className="w-4 h-4"/>
-                    <span className="text-sm font-medium mr-1">{slot.instrument}</span>
+                    <span className="text-sm font-medium mr-1">{instrumentLabelForKey(slot.instrument)}</span>
                     <Select value={slot.memberId || ''} onValueChange={(v) => onSetAssign(s.id, slot.id, v || undefined)} valueLabel={slot.memberId ? (members.find((m) => m.id === slot.memberId)?.name || slot.memberId) : undefined}>
-                      <SelectTrigger className="h-8 w-full"><SelectValue placeholder="Select member" /></SelectTrigger>
+                      <SelectTrigger className="w-full"><SelectValue placeholder="Select member" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">— Unassigned —</SelectItem>
                         {eligibleForSlot(s, slot).map((m) => (
