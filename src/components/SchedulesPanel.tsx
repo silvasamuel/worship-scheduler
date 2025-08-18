@@ -7,6 +7,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Schedule, AssignmentSlot, Member } from '@/types'
 import { INSTRUMENTS, instrumentLabelForKey } from '@/lib/instruments'
 import { dayLabel } from '@/lib/date'
+import { useI18n } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 type Props = {
@@ -20,6 +21,7 @@ type Props = {
 }
 
 export default function SchedulesPanel({ schedules, members, onAddSchedule, onRemoveSchedule, onSetAssign, autoFill, eligibleForSlot }: Props) {
+  const { t, locale, instrumentLabel } = useI18n()
   const [sDate, setSDate] = useState('')
   const [sInstruments, setSInstruments] = useState<string[]>([])
   const canAddSchedule = Boolean(sDate) && sInstruments.length > 0
@@ -69,7 +71,7 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
       <CardContent className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <CalendarPlus className="w-5 h-5"/>
-          <h2 className="font-semibold">Schedules</h2>
+          <h2 className="font-semibold">{t('schedules.title')}</h2>
         </div>
 
         <div className="grid md:grid-cols-[1fr_auto_auto] gap-3 mb-3 items-start">
@@ -77,7 +79,7 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
             {[...INSTRUMENTS].sort((a,b)=>a.localeCompare(b)).map((inst) => {
               const active = sInstruments.includes(inst)
               return (
-                <button key={inst} type="button" className={`rounded-xl border px-3 py-2 text-sm text-center w-full ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-900 hover:bg-gray-50'}`} onClick={() => setSInstruments((prev) => active ? prev.filter((i) => i !== inst) : [...prev, inst])}>{inst}</button>
+                <button key={inst} type="button" className={`rounded-xl border px-3 py-2 text-sm text-center w-full ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-900 hover:bg-gray-50'}`} onClick={() => setSInstruments((prev) => active ? prev.filter((i) => i !== inst) : [...prev, inst])}>{instrumentLabel(inst)}</button>
               )
             })}
           </div>
@@ -89,9 +91,9 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
             >
               <span className="grid">
                 <span className="col-start-1 row-start-1 whitespace-nowrap">
-                  {sInstruments.length === INSTRUMENTS.length ? 'Unselect All' : 'Select All'}
+                  {sInstruments.length === INSTRUMENTS.length ? t('schedules.unselectAll') : t('schedules.selectAll')}
                 </span>
-                <span className="col-start-1 row-start-1 opacity-0 pointer-events-none select-none whitespace-nowrap">Unselect All</span>
+                <span className="col-start-1 row-start-1 opacity-0 pointer-events-none select-none whitespace-nowrap">{t('schedules.unselectAll')}</span>
               </span>
             </Button>
           </div>
@@ -111,17 +113,17 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
               <Button
                 onClick={addSchedule}
                 disabled={!canAddSchedule}
-                title={!canAddSchedule ? 'Select a date and at least one instrument to add a schedule' : undefined}
+                title={!canAddSchedule ? t('schedules.tooltip.add') : undefined}
                 className="gap-2 shrink-0"
               >
-                <Plus className="w-4 h-4"/>Add Schedule
+                <Plus className="w-4 h-4"/>{t('schedules.add')}
               </Button>
               {!canAddSchedule && showAddScheduleTip && (
                 <span
                   role="tooltip"
                   className={`pointer-events-none absolute z-30 rounded-md bg-gray-900 text-white text-xs px-2 py-1 shadow-lg border border-white/10 whitespace-nowrap ${scheduleTipPlacement === 'top' ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' : 'top-full mt-2 left-1/2 -translate-x-1/2'}`}
                 >
-                  Select a date and at least one instrument
+                  {t('schedules.tooltip.add')}
                   <span className={`absolute w-2 h-2 bg-gray-900 rotate-45 border border-white/10 ${scheduleTipPlacement === 'top' ? 'top-full left-1/2 -translate-x-1/2 -mt-px' : 'bottom-full left-1/2 -translate-x-1/2 -mb-px'}`}></span>
                 </span>
               )}
@@ -130,12 +132,12 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
         </div>
 
         <div className="space-y-3">
-          {schedules.length === 0 && <p className="text-sm text-gray-500">No schedules yet. Add a date and instruments above.</p>}
+          {schedules.length === 0 && <p className="text-sm text-gray-500">{t('schedules.empty')}</p>}
           {schedules.map((s) => (
             <div key={s.id} className="rounded-2xl border p-3 bg-white">
               <div className="flex items-center gap-2">
-                <div className="font-semibold">{dayLabel(s.date)}</div>
-                <Badge className={s.status === 'complete' ? 'bg-green-600' : s.status === 'partial' ? 'bg-amber-500' : 'bg-gray-400'}>{s.status}</Badge>
+                <div className="font-semibold">{dayLabel(s.date, locale)}</div>
+                <Badge className={s.status === 'complete' ? 'bg-green-600' : s.status === 'partial' ? 'bg-amber-500' : 'bg-gray-400'}>{t(`status.${s.status}`)}</Badge>
                 <div className="ml-auto flex items-center gap-2">
                   <Button variant="ghost" size="icon" onClick={() => setConfirmRemoveId(s.id)}><Trash2 className="w-4 h-4"/></Button>
                 </div>
@@ -145,11 +147,11 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
                 {s.assignments.map((slot) => (
                   <div key={slot.id} className="flex items-center gap-2 bg-gray-50 rounded-xl p-2">
                     <Music className="w-4 h-4"/>
-                    <span className="text-sm font-medium mr-1">{instrumentLabelForKey(slot.instrument)}</span>
+                    <span className="text-sm font-medium mr-1">{instrumentLabel(slot.instrument)}</span>
                     <Select value={slot.memberId || ''} onValueChange={(v) => onSetAssign(s.id, slot.id, v || undefined)} valueLabel={slot.memberId ? (members.find((m) => m.id === slot.memberId)?.name || slot.memberId) : undefined}>
-                      <SelectTrigger className="w-full"><SelectValue placeholder="Select member" /></SelectTrigger>
+                      <SelectTrigger className="w-full"><SelectValue placeholder={t('select.member.placeholder')} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">— Unassigned —</SelectItem>
+                        <SelectItem value="">{t('select.unassigned')}</SelectItem>
                         {eligibleForSlot(s, slot).map((m) => (
                           <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
                         ))}
@@ -179,9 +181,9 @@ export default function SchedulesPanel({ schedules, members, onAddSchedule, onRe
         <ConfirmDialog
           open={!!confirmRemoveId}
           onOpenChange={(o) => !o && setConfirmRemoveId(null)}
-          title="Remove schedule?"
-          description={confirmRemoveId ? 'Are you sure you want to remove this schedule? This cannot be undone.' : undefined}
-          confirmLabel="Delete"
+          title={t('confirm.schedule.title')}
+          description={confirmRemoveId ? t('confirm.schedule.desc') : undefined}
+          confirmLabel={t('actions.delete')}
           confirmVariant="destructive"
           onConfirm={() => {
             if (confirmRemoveId) {

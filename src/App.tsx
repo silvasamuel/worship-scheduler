@@ -7,8 +7,9 @@ import { useSchedulerState } from '@/state/useSchedulerState'
 import { isWeekend } from '@/lib/date'
 import { norm } from '@/lib/instruments'
 import { AssignmentSlot, Member, Schedule } from '@/types'
+import { I18nProvider, useI18n } from '@/lib/i18n'
 
-export default function WorshipSchedulerApp() {
+function AppInner() {
   const {
     members,
     schedules,
@@ -23,6 +24,7 @@ export default function WorshipSchedulerApp() {
     importData,
     resetAll,
   } = useSchedulerState()
+  const { t, lang, setLang, locale } = useI18n()
 
   function eligibleForSlot(schedule: Schedule, slot: AssignmentSlot): Member[] {
     const weekend = isWeekend(schedule.date)
@@ -39,7 +41,7 @@ export default function WorshipSchedulerApp() {
       <header className="sticky top-0 z-10 backdrop-blur bg-white/70 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
           <Sparkles className="w-6 h-6" />
-          <h1 className="text-xl font-semibold">Worship Team Scheduler</h1>
+          <h1 className="text-xl font-semibold">{t('app.title')}</h1>
           <div className="ml-auto flex items-center gap-2">
             <Button
               variant="secondary"
@@ -54,7 +56,7 @@ export default function WorshipSchedulerApp() {
               }}
               className="gap-2"
             >
-              <Download className="w-4 h-4" />Export
+              <Download className="w-4 h-4" />{t('actions.export')}
             </Button>
             <label className="inline-flex items-center gap-2 cursor-pointer">
               <input
@@ -82,11 +84,22 @@ export default function WorshipSchedulerApp() {
                 }}
               />
               <span className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm flex items-center gap-2">
-                <Upload className="w-4 h-4" />Import
+                <Upload className="w-4 h-4" />{t('actions.import')}
               </span>
             </label>
+            <div className="flex items-center gap-2 ml-2">
+              <label className="text-xs text-gray-600">{t('language.label')}</label>
+              <select
+                className="h-9 rounded-xl border border-gray-300 bg-white px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                value={lang}
+                onChange={(e) => setLang(e.target.value as any)}
+              >
+                <option value="en">{t('language.english')}</option>
+                <option value="pt-BR">{t('language.portuguese')}</option>
+              </select>
+            </div>
             <Button variant="destructive" onClick={resetAll} className="gap-2">
-              Reset
+              {t('actions.reset')}
             </Button>
           </div>
         </div>
@@ -115,5 +128,13 @@ export default function WorshipSchedulerApp() {
         Built with 💜
       </footer>
     </div>
+  )
+}
+
+export default function WorshipSchedulerApp() {
+  return (
+    <I18nProvider>
+      <AppInner />
+    </I18nProvider>
   )
 }
