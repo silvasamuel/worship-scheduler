@@ -10,9 +10,14 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 const variants: Record<BadgeVariant, string> = {
   default: 'bg-gray-900 text-white',
   secondary: 'bg-gray-200 text-gray-900',
-  outline: 'border border-gray-300 text-gray-800'
+  outline: 'border border-gray-300 text-gray-800',
 }
 
 export function Badge({ className, variant = 'default', ...props }: BadgeProps) {
-  return <div className={cn('inline-flex items-center rounded-xl px-2 py-1 text-xs', variants[variant], className)} {...props} />
+  return (
+    <div
+      className={cn('inline-flex items-center rounded-xl px-2 py-1 text-xs', variants[variant], className)}
+      {...props}
+    />
+  )
 }

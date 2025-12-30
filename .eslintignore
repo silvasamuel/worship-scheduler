@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+.husky
+*.config.js
+*.config.ts
+vite.config.ts
+

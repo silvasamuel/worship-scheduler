@@ -62,7 +62,9 @@ export function Select({ value = '', onValueChange, valueLabel, children }: Sele
 
   return (
     <SelectContext.Provider value={{ value: internal, setValue, open, setOpen, registerLabel, getLabel, valueLabel }}>
-      <div ref={containerRef} className="w-full">{children}</div>
+      <div ref={containerRef} className="w-full">
+        {children}
+      </div>
     </SelectContext.Provider>
   )
 }
@@ -71,14 +73,17 @@ export function SelectTrigger({ className, children, ...props }: React.HTMLAttri
   const ctx = React.useContext(SelectContext)
   return (
     <div
-      className={cn('relative rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 ring-offset-white', className)}
+      className={cn(
+        'relative rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 ring-offset-white',
+        className
+      )}
       role="button"
       aria-haspopup="listbox"
       aria-expanded={!!ctx?.open}
       tabIndex={0}
       {...props}
       onClick={() => ctx?.setOpen(!ctx.open)}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           ctx?.setOpen(!ctx.open)
@@ -100,10 +105,10 @@ export function SelectTrigger({ className, children, ...props }: React.HTMLAttri
 
 export function SelectValue({ placeholder }: { placeholder?: string }) {
   const ctx = React.useContext(SelectContext)
-  const label = (ctx?.valueLabel && ctx.value) ? ctx.valueLabel : ctx?.getLabel(ctx?.value || '')
+  const label = ctx?.valueLabel && ctx.value ? ctx.valueLabel : ctx?.getLabel(ctx?.value || '')
   return (
     <div className="h-9 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 flex items-center text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
-      {ctx?.value ? (label ?? ctx.value) : (placeholder || 'Select')}
+      {ctx?.value ? (label ?? ctx.value) : placeholder || 'Select'}
     </div>
   )
 }
@@ -113,10 +118,14 @@ export function SelectContent({ children, className, ...rest }: React.HTMLAttrib
   if (!ctx) return null
   if (!ctx.open) return null
   return (
-    <div className={cn('absolute z-10 mt-1 min-w-[12rem] w-max rounded-xl border border-gray-200 bg-white shadow', className)} {...rest}>
-      <div className="max-h-60 overflow-auto py-1">
-        {children}
-      </div>
+    <div
+      className={cn(
+        'absolute z-10 mt-1 min-w-[12rem] w-max rounded-xl border border-gray-200 bg-white shadow',
+        className
+      )}
+      {...rest}
+    >
+      <div className="max-h-60 overflow-auto py-1">{children}</div>
     </div>
   )
 }
@@ -131,7 +140,10 @@ export function SelectItem({ value, children }: { value: string; children?: Reac
   const selected = ctx?.value === value
   return (
     <div
-      className={cn('cursor-pointer select-none rounded-lg px-3 py-1.5 text-sm hover:bg-gray-100', selected && 'bg-gray-100')}
+      className={cn(
+        'cursor-pointer select-none rounded-lg px-3 py-1.5 text-sm hover:bg-gray-100',
+        selected && 'bg-gray-100'
+      )}
       onClick={() => {
         ctx?.setValue(value)
         ctx?.setOpen(false)

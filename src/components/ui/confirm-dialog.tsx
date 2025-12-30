@@ -28,12 +28,14 @@ export function ConfirmDialog({
       <div className="space-y-4">
         {description && <div className="text-sm text-gray-700">{description}</div>}
         <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>{cancelLabel}</Button>
-          <Button variant={confirmVariant} onClick={onConfirm}>{confirmLabel}</Button>
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+            {cancelLabel}
+          </Button>
+          <Button variant={confirmVariant} onClick={onConfirm}>
+            {confirmLabel}
+          </Button>
         </div>
       </div>
     </Modal>
   )
 }
-
-

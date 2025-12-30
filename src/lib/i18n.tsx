@@ -38,6 +38,8 @@ const MESSAGES: Record<Lang, Messages> = {
     'schedules.add': 'Add Schedule',
     'schedules.empty': 'No schedules yet. Add a date and instruments above.',
     'schedules.tooltip.add': 'Select a date and at least one instrument',
+    'schedules.addInstrument': 'Add instrument...',
+    'schedules.removeSlot': 'Remove slot',
 
     'status.complete': 'Complete',
     'status.partial': 'Partial',
@@ -53,6 +55,20 @@ const MESSAGES: Record<Lang, Messages> = {
     'language.english': 'English',
     'language.portuguese': 'Português (BR)',
     'language.label': 'Language',
+
+    'tabs.members': 'Members',
+    'tabs.schedules': 'Schedules',
+    'tabs.statistics': 'Statistics',
+
+    'statistics.title': 'Statistics',
+    'statistics.description': 'Number of schedule assignments per member',
+    'statistics.empty': 'No statistics available. Add members and schedules first.',
+    'statistics.schedule': 'schedule',
+    'statistics.schedules': 'schedules',
+    'statistics.totalMembers': 'Total Members',
+    'statistics.totalSchedules': 'Total Schedules',
+    'statistics.totalAssignments': 'Total Assignments',
+    'statistics.averagePerMember': 'Average per Member',
   },
   'pt-BR': {
     'app.title': 'Gerador de Escalas de Ministério de Louvor',
@@ -86,6 +102,8 @@ const MESSAGES: Record<Lang, Messages> = {
     'schedules.add': 'Adicionar Escala',
     'schedules.empty': 'Nenhuma escala ainda. Adicione uma data e instrumentos acima.',
     'schedules.tooltip.add': 'Selecione uma data e pelo menos um instrumento',
+    'schedules.addInstrument': 'Adicionar instrumento...',
+    'schedules.removeSlot': 'Remover slot',
 
     'status.complete': 'Completa',
     'status.partial': 'Parcial',
@@ -101,6 +119,20 @@ const MESSAGES: Record<Lang, Messages> = {
     'language.english': 'English',
     'language.portuguese': 'Português (BR)',
     'language.label': 'Idioma',
+
+    'tabs.members': 'Membros',
+    'tabs.schedules': 'Escalas',
+    'tabs.statistics': 'Estatísticas',
+
+    'statistics.title': 'Estatísticas',
+    'statistics.description': 'Número de atribuições de escala por membro',
+    'statistics.empty': 'Nenhuma estatística disponível. Adicione membros e escalas primeiro.',
+    'statistics.schedule': 'escala',
+    'statistics.schedules': 'escalas',
+    'statistics.totalMembers': 'Total de Membros',
+    'statistics.totalSchedules': 'Total de Escalas',
+    'statistics.totalAssignments': 'Total de Atribuições',
+    'statistics.averagePerMember': 'Média por Membro',
   },
 }
 
@@ -126,21 +158,31 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = React.useState<Lang>(initialLang())
   const setLang = (l: Lang) => {
     setLangState(l)
-    try { window.localStorage.setItem(STORAGE_KEY, l) } catch {}
-  }
-  const t = React.useCallback((key: string, params?: Record<string, string | number>) => {
-    const dict = MESSAGES[lang] || MESSAGES.en
-    let out = dict[key] ?? key
-    if (params) {
-      Object.entries(params).forEach(([k, v]) => {
-        out = out.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v))
-      })
+    try {
+      window.localStorage.setItem(STORAGE_KEY, l)
+    } catch {
+      // Ignore localStorage errors (e.g., in private browsing mode)
     }
-    return out
-  }, [lang])
+  }
+  const t = React.useCallback(
+    (key: string, params?: Record<string, string | number>) => {
+      const dict = MESSAGES[lang] || MESSAGES.en
+      let out = dict[key] ?? key
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          out = out.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v))
+        })
+      }
+      return out
+    },
+    [lang]
+  )
   const locale = lang === 'pt-BR' ? 'pt-BR' : 'en-US'
   const instrumentLabel = React.useCallback((key: string) => getInstrumentLabel(lang, key), [lang])
-  const value = React.useMemo(() => ({ lang, setLang, t, locale, instrumentLabel }), [lang, setLang, t, locale, instrumentLabel])
+  const value = React.useMemo(
+    () => ({ lang, setLang, t, locale, instrumentLabel }),
+    [lang, setLang, t, locale, instrumentLabel]
+  )
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
 
@@ -167,5 +209,3 @@ export function getInstrumentLabel(lang: Lang, key: string): string {
   const record = INSTRUMENT_TRANSLATIONS[k]
   return record ? record[lang] : key
 }
-
-

@@ -17,11 +17,15 @@ export function Modal({ open, onOpenChange, title, children, className }: ModalP
       <div className={cn('relative z-10 w-full max-w-xl rounded-2xl border bg-white p-4 shadow-lg', className)}>
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-base font-semibold">{title}</h4>
-          <button className="rounded-lg p-1 text-gray-600 hover:bg-gray-100" onClick={() => onOpenChange(false)} aria-label="Close">✕</button>
+          <button
+            className="rounded-lg p-1 text-gray-600 hover:bg-gray-100"
+            onClick={() => onOpenChange(false)}
+            aria-label="Close"
+          >
+            ✕
+          </button>
         </div>
-        <div className="text-sm text-gray-800">
-          {children}
-        </div>
+        <div className="text-sm text-gray-800">{children}</div>
       </div>
     </div>
   )
