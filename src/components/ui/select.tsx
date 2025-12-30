@@ -28,8 +28,10 @@ export function Select({ value = '', onValueChange, valueLabel, children }: Sele
   const [open, setOpen] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const labelsRef = React.useRef<Map<string, string>>(new Map())
+  const [currentValueLabel, setCurrentValueLabel] = React.useState(valueLabel)
 
   React.useEffect(() => setInternal(value), [value])
+  React.useEffect(() => setCurrentValueLabel(valueLabel), [valueLabel])
 
   const setValue = (v: string) => {
     setInternal(v)
@@ -61,7 +63,9 @@ export function Select({ value = '', onValueChange, valueLabel, children }: Sele
   }, [open])
 
   return (
-    <SelectContext.Provider value={{ value: internal, setValue, open, setOpen, registerLabel, getLabel, valueLabel }}>
+    <SelectContext.Provider
+      value={{ value: internal, setValue, open, setOpen, registerLabel, getLabel, valueLabel: currentValueLabel }}
+    >
       <div ref={containerRef} className="w-full">
         {children}
       </div>

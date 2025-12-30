@@ -19,14 +19,14 @@ type Props = {
   mAssigned: (m: Member) => number
 }
 
-export function availabilityLabel(a: Availability): string {
+export function availabilityLabel(a: Availability, t?: (key: string) => string): string {
   switch (a) {
     case 'both':
-      return 'Weekdays & Weekends'
+      return t('availability.both')
     case 'weekdays':
-      return 'Weekdays only'
+      return t('availability.weekdays')
     case 'weekends':
-      return 'Weekends only'
+      return t('availability.weekends')
     default:
       return String(a)
   }
@@ -149,7 +149,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
               <Select
                 value={(mAvailability as Availability | '') || ''}
                 onValueChange={(v: string) => setMAvailability(v as Availability)}
-                valueLabel={mAvailability ? availabilityLabel(mAvailability as Availability) : undefined}
+                valueLabel={mAvailability ? availabilityLabel(mAvailability as Availability, t) : undefined}
               >
                 <SelectTrigger className="h-9 w-full">
                   <SelectValue placeholder={t('members.availability')} />
@@ -219,7 +219,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex gap-2 items-center">
                   <Badge variant="outline" className="rounded-full">
-                    {availabilityLabel(m.availability)}
+                    {availabilityLabel(m.availability, t)}
                   </Badge>
                   <span>
                     {t('members.target')}: {m.targetCount}
@@ -285,7 +285,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                 <Select
                   value={eAvailability}
                   onValueChange={(v: string) => setEAvailability(v as Availability)}
-                  valueLabel={availabilityLabel(eAvailability)}
+                  valueLabel={availabilityLabel(eAvailability, t)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select availability" />
