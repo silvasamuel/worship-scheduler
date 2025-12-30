@@ -5,6 +5,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import MembersPanel from '@/components/MembersPanel'
 import SchedulesPanel from '@/components/SchedulesPanel'
 import StatisticsPanel from '@/components/StatisticsPanel'
+import ReviewPanel from '@/components/ReviewPanel'
 import { useSchedulerState } from '@/state/useSchedulerState'
 import { isWeekend } from '@/lib/date'
 import { norm, isVocalInstrument } from '@/lib/instruments'
@@ -29,7 +30,7 @@ function AppInner() {
     resetAll,
   } = useSchedulerState()
   const { t, lang, setLang } = useI18n()
-  const [activeTab, setActiveTab] = useState<'members' | 'schedules' | 'statistics'>('members')
+  const [activeTab, setActiveTab] = useState<'members' | 'schedules' | 'statistics' | 'review'>('members')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   function eligibleForSlot(schedule: Schedule, slot: AssignmentSlot): Member[] {
@@ -178,6 +179,16 @@ function AppInner() {
             >
               {t('tabs.statistics')}
             </button>
+            <button
+              onClick={() => setActiveTab('review')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'review'
+                  ? 'border-gray-900 text-gray-900'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('tabs.review')}
+            </button>
           </nav>
         </div>
 
@@ -204,6 +215,7 @@ function AppInner() {
           />
         )}
         {activeTab === 'statistics' && <StatisticsPanel members={members} schedules={schedules} />}
+        {activeTab === 'review' && <ReviewPanel members={members} schedules={schedules} />}
       </main>
 
       <footer className="max-w-6xl mx-auto px-4 pb-10 text-xs text-gray-500">Built with 💜</footer>

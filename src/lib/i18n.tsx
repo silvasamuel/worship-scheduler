@@ -62,6 +62,7 @@ const MESSAGES: Record<Lang, Messages> = {
     'tabs.members': 'Members',
     'tabs.schedules': 'Schedules',
     'tabs.statistics': 'Statistics',
+    'tabs.review': 'Review',
 
     'statistics.title': 'Statistics',
     'statistics.description': 'Number of schedule assignments per member',
@@ -72,6 +73,11 @@ const MESSAGES: Record<Lang, Messages> = {
     'statistics.totalSchedules': 'Total Schedules',
     'statistics.totalAssignments': 'Total Assignments',
     'statistics.averagePerMember': 'Average per Member',
+
+    'review.title': 'Worship Team Schedules',
+    'review.date': 'Date',
+    'review.export': 'Export as Image',
+    'review.noSchedules': 'No schedules available to review.',
   },
   'pt-BR': {
     'app.title': 'Gerador de Escalas de Ministério de Louvor',
@@ -129,6 +135,7 @@ const MESSAGES: Record<Lang, Messages> = {
     'tabs.members': 'Membros',
     'tabs.schedules': 'Escalas',
     'tabs.statistics': 'Estatísticas',
+    'tabs.review': 'Revisar',
 
     'statistics.title': 'Estatísticas',
     'statistics.description': 'Número de atribuições de escala por membro',
@@ -139,6 +146,11 @@ const MESSAGES: Record<Lang, Messages> = {
     'statistics.totalSchedules': 'Total de Escalas',
     'statistics.totalAssignments': 'Total de Atribuições',
     'statistics.averagePerMember': 'Média por Membro',
+
+    'review.title': 'Escalas do Ministério de Louvor',
+    'review.date': 'Data',
+    'review.export': 'Exportar como Imagem',
+    'review.noSchedules': 'Nenhuma escala disponível para revisar.',
   },
 }
 
