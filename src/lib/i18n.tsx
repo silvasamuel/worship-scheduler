@@ -52,6 +52,9 @@ const MESSAGES: Record<Lang, Messages> = {
     'confirm.member.desc': 'Are you sure you want to remove {name}? This cannot be undone.',
     'confirm.schedule.title': 'Remove schedule?',
     'confirm.schedule.desc': 'Are you sure you want to remove this schedule? This cannot be undone.',
+    'confirm.reset.title': 'Reset all data?',
+    'confirm.reset.desc':
+      'Are you sure you want to reset all members and schedules? This action cannot be undone and all data will be permanently deleted.',
     'language.english': 'English',
     'language.portuguese': 'Português (BR)',
     'language.label': 'Language',
@@ -116,6 +119,9 @@ const MESSAGES: Record<Lang, Messages> = {
     'confirm.member.desc': 'Tem certeza que deseja remover {name}? Esta ação não pode ser desfeita.',
     'confirm.schedule.title': 'Remover escala?',
     'confirm.schedule.desc': 'Tem certeza que deseja remover esta escala? Esta ação não pode ser desfeita.',
+    'confirm.reset.title': 'Limpar todos os dados?',
+    'confirm.reset.desc':
+      'Tem certeza que deseja limpar todos os membros e escalas? Esta ação não pode ser desfeita e todos os dados serão permanentemente excluídos.',
     'language.english': 'English',
     'language.portuguese': 'Português (BR)',
     'language.label': 'Idioma',

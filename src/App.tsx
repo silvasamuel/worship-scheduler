@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Sparkles, Download, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import MembersPanel from '@/components/MembersPanel'
 import SchedulesPanel from '@/components/SchedulesPanel'
 import StatisticsPanel from '@/components/StatisticsPanel'
@@ -29,6 +30,7 @@ function AppInner() {
   } = useSchedulerState()
   const { t, lang, setLang } = useI18n()
   const [activeTab, setActiveTab] = useState<'members' | 'schedules' | 'statistics'>('members')
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   function eligibleForSlot(schedule: Schedule, slot: AssignmentSlot): Member[] {
     const weekend = isWeekend(schedule.date)
@@ -136,7 +138,7 @@ function AppInner() {
                 <option value="pt-BR">{t('language.portuguese')}</option>
               </select>
             </div>
-            <Button variant="destructive" onClick={resetAll} className="gap-2">
+            <Button variant="destructive" onClick={() => setShowResetConfirm(true)} className="gap-2">
               {t('actions.reset')}
             </Button>
           </div>
@@ -205,6 +207,20 @@ function AppInner() {
       </main>
 
       <footer className="max-w-6xl mx-auto px-4 pb-10 text-xs text-gray-500">Built with 💜</footer>
+
+      <ConfirmDialog
+        open={showResetConfirm}
+        onOpenChange={setShowResetConfirm}
+        title={t('confirm.reset.title')}
+        description={t('confirm.reset.desc')}
+        confirmLabel={t('actions.reset')}
+        cancelLabel={t('actions.cancel')}
+        confirmVariant="destructive"
+        onConfirm={() => {
+          resetAll()
+          setShowResetConfirm(false)
+        }}
+      />
     </div>
   )
 }
