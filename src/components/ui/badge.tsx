@@ -8,9 +8,9 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variants: Record<BadgeVariant, string> = {
-  default: 'bg-gray-900 text-white',
-  secondary: 'bg-gray-200 text-gray-900',
-  outline: 'border border-gray-300 text-gray-800',
+  default: 'bg-gray-900 text-white shadow-sm',
+  secondary: 'bg-gray-100 text-gray-900 border border-gray-200',
+  outline: 'border border-gray-300 text-gray-800 bg-white',
 }
 
 export function Badge({ className, variant = 'default', ...props }: BadgeProps) {

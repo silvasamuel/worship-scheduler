@@ -35,11 +35,11 @@ export default function StatisticsPanel({ members, schedules }: Props) {
   const barHeight = 30
 
   return (
-    <Card className="shadow-sm">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="w-5 h-5" />
-          <h2 className="font-semibold">{t('statistics.title')}</h2>
+    <Card className="shadow-md">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <BarChart3 className="w-5 h-5 text-gray-700" />
+          <h2 className="text-lg font-bold text-gray-900">{t('statistics.title')}</h2>
         </div>
 
         {memberStats.length === 0 ? (

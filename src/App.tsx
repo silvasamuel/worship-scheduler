@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Sparkles, Download, Upload } from 'lucide-react'
+import { Download, Upload } from 'lucide-react'
+import logo from '@/assets/logo.png'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import MembersPanel from '@/components/MembersPanel'
@@ -76,11 +77,13 @@ function AppInner() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="sticky top-0 z-10 backdrop-blur bg-white/70 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Sparkles className="w-6 h-6" />
-          <h1 className="text-xl font-semibold">{t('app.title')}</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 text-gray-900">
+      <header className="sticky top-0 z-10 backdrop-blur-md bg-white/80 border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+          <img src={logo} alt="Logo" className="w-7 h-7 rounded-lg shadow-sm" />
+          <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            {t('app.title')}
+          </h1>
           <div className="ml-auto flex items-center gap-2">
             <Button
               variant="secondary"
@@ -123,7 +126,7 @@ function AppInner() {
                   ;(ev.currentTarget as HTMLInputElement).value = ''
                 }}
               />
-              <span className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm flex items-center gap-2">
+              <span className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
                 <Upload className="w-4 h-4" />
                 {t('actions.import')}
               </span>
@@ -131,7 +134,7 @@ function AppInner() {
             <div className="flex items-center gap-2 ml-2">
               <label className="text-xs text-gray-600">{t('language.label')}</label>
               <select
-                className="h-9 rounded-xl border border-gray-300 bg-white px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                className="h-9 rounded-xl border border-gray-300 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 shadow-sm transition-all duration-200"
                 value={lang}
                 onChange={e => setLang(e.target.value as Lang)}
               >
@@ -146,45 +149,45 @@ function AppInner() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto p-4">
-        <div className="mb-4 border-b border-gray-200">
-          <nav className="flex gap-2">
+      <main className="max-w-6xl mx-auto p-6">
+        <div className="mb-6 border-b border-gray-200/60">
+          <nav className="flex gap-1">
             <button
               onClick={() => setActiveTab('members')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 rounded-t-lg ${
                 activeTab === 'members'
-                  ? 'border-gray-900 text-gray-900'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-gray-900 text-gray-900 bg-gray-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
               }`}
             >
               {t('tabs.members')}
             </button>
             <button
               onClick={() => setActiveTab('schedules')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 rounded-t-lg ${
                 activeTab === 'schedules'
-                  ? 'border-gray-900 text-gray-900'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-gray-900 text-gray-900 bg-gray-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
               }`}
             >
               {t('tabs.schedules')}
             </button>
             <button
               onClick={() => setActiveTab('statistics')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 rounded-t-lg ${
                 activeTab === 'statistics'
-                  ? 'border-gray-900 text-gray-900'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-gray-900 text-gray-900 bg-gray-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
               }`}
             >
               {t('tabs.statistics')}
             </button>
             <button
               onClick={() => setActiveTab('review')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 rounded-t-lg ${
                 activeTab === 'review'
-                  ? 'border-gray-900 text-gray-900'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-gray-900 text-gray-900 bg-gray-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
               }`}
             >
               {t('tabs.review')}

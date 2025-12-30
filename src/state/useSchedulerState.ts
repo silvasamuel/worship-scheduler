@@ -20,11 +20,20 @@ export function useSchedulerState() {
     return schedules.reduce((acc, s) => acc + s.assignments.filter(a => a.memberId === m.id).length, 0)
   }
 
-  function computeStatus(assignments: AssignmentSlot[]): { status: Schedule['status']; issues: string[] } {
+  function computeStatus(
+    assignments: AssignmentSlot[],
+    t?: (key: string, params?: Record<string, string | number>) => string
+  ): { status: Schedule['status']; issues: string[] } {
     const unfilled = assignments.filter(a => !a.memberId).length
+    const issues =
+      unfilled === 0
+        ? []
+        : t
+          ? [t('autofill.positionsUnfilled', { count: unfilled })]
+          : [`${unfilled} position(s) unfilled.`]
     return {
       status: assignments.length === 0 ? 'empty' : unfilled === 0 ? 'complete' : 'partial',
-      issues: unfilled === 0 ? [] : [`${unfilled} position(s) unfilled.`],
+      issues,
     }
   }
 
@@ -100,7 +109,10 @@ export function useSchedulerState() {
   }
 
   // Autofill respecting canSingAndPlay between vocal and instrument
-  function autoFill() {
+  function autoFill(
+    t?: (key: string, params?: Record<string, string | number>) => string,
+    instrumentLabel?: (key: string) => string
+  ) {
     const counts: Record<string, number> = {}
     members.forEach(m => (counts[m.id] = 0))
     schedules.forEach(s =>
@@ -156,16 +168,21 @@ export function useSchedulerState() {
       const missing = newAssignments.filter(a => !a.memberId)
       const issues: string[] = []
       missing.forEach(m => {
+        const instLabel = instrumentLabel ? instrumentLabel(m.instrument) : m.instrument
         const noInstrument = members.filter(mem => mem.instruments.map(norm).includes(norm(m.instrument))).length === 0
         if (noInstrument) {
-          issues.push(`No member plays "${m.instrument}".`)
+          issues.push(t ? t('autofill.noMemberPlays', { instrument: instLabel }) : `No member plays "${instLabel}".`)
           return
         }
         const availMatch =
           members.filter(mem => mem.instruments.map(norm).includes(norm(m.instrument)) && canServeDate(mem, s.date))
             .length > 0
         if (!availMatch) {
-          issues.push(`No eligible member for "${m.instrument}" is available on ${dayLabel(s.date)}.`)
+          issues.push(
+            t
+              ? t('autofill.noEligibleMember', { instrument: instLabel, date: dayLabel(s.date) })
+              : `No eligible member for "${instLabel}" is available on ${dayLabel(s.date)}.`
+          )
           return
         }
         const remainingCap =
@@ -176,13 +193,21 @@ export function useSchedulerState() {
               counts[mem.id] < mem.targetCount
           ).length > 0
         if (!remainingCap) {
-          issues.push(`All eligible members for "${m.instrument}" reached their target count.`)
+          issues.push(
+            t
+              ? t('autofill.allReachedTarget', { instrument: instLabel })
+              : `All eligible members for "${instLabel}" reached their target count.`
+          )
           return
         }
-        issues.push(`Conflict prevented assignment for "${m.instrument}".`)
+        issues.push(
+          t
+            ? t('autofill.conflictPrevented', { instrument: instLabel })
+            : `Conflict prevented assignment for "${instLabel}".`
+        )
       })
 
-      const { status } = computeStatus(newAssignments)
+      const { status } = computeStatus(newAssignments, t)
       return { ...s, assignments: newAssignments, status, issues }
     })
 

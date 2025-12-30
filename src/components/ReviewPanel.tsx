@@ -100,7 +100,7 @@ export default function ReviewPanel({ schedules, members }: Props) {
       <div className="flex justify-end">
         <button
           onClick={exportAsImage}
-          className="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors"
+          className="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
         >
           {t('review.export')}
         </button>
@@ -187,7 +187,7 @@ export default function ReviewPanel({ schedules, members }: Props) {
                       <div className="flex items-center gap-2">
                         <div className="relative" style={{ width: barMaxWidth, height: barHeight }}>
                           <div
-                            className="bg-blue-500 rounded-lg h-full flex items-center justify-end pr-2 transition-all duration-300"
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg h-full flex items-center justify-end pr-2 transition-all duration-300 shadow-sm"
                             style={{ width: `${width}px` }}
                           >
                             {stat.count > 0 && <span className="text-xs font-semibold text-white">{stat.count}</span>}

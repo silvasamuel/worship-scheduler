@@ -112,10 +112,10 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
   }
 
   return (
-    <Card className="shadow-sm">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <h2 className="font-semibold">{t('members.title')}</h2>
+    <Card className="shadow-md">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <h2 className="text-lg font-bold text-gray-900">{t('members.title')}</h2>
         </div>
 
         <div className="grid gap-3 mb-3">
@@ -134,7 +134,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                     <button
                       key={inst}
                       type="button"
-                      className={`rounded-xl border px-3 py-2 text-sm text-center w-full ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-900 hover:bg-gray-50'}`}
+                      className={`rounded-xl border px-3 py-2 text-sm text-center w-full transition-all duration-200 shadow-sm hover:shadow-md ${active ? 'bg-gray-900 text-white border-gray-900 shadow-md' : 'bg-white text-gray-900 hover:bg-gray-50 border-gray-300'}`}
                       onClick={() => setMInstruments(prev => (active ? prev.filter(i => i !== inst) : [...prev, inst]))}
                     >
                       {instrumentLabel(inst)}
@@ -253,7 +253,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                       <button
                         key={inst}
                         type="button"
-                        className={`rounded-full border px-3 py-1 text-sm ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-900 hover:bg-gray-50'}`}
+                        className={`rounded-full border px-3 py-1 text-sm transition-all duration-200 shadow-sm hover:shadow-md ${active ? 'bg-gray-900 text-white border-gray-900 shadow-md' : 'bg-white text-gray-900 hover:bg-gray-50 border-gray-300'}`}
                         onClick={() =>
                           setEInstruments(prev => {
                             const arr = prev

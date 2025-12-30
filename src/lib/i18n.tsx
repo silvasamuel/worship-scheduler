@@ -7,7 +7,7 @@ type Messages = Record<string, string>
 
 const MESSAGES: Record<Lang, Messages> = {
   en: {
-    'app.title': 'Worship Team Scheduler',
+    'app.title': 'Worship Scheduler',
 
     'actions.export': 'Export',
     'actions.import': 'Import',
@@ -78,9 +78,15 @@ const MESSAGES: Record<Lang, Messages> = {
     'review.date': 'Date',
     'review.export': 'Export as Image',
     'review.noSchedules': 'No schedules available to review.',
+
+    'autofill.noMemberPlays': 'No member plays "{instrument}".',
+    'autofill.noEligibleMember': 'No eligible member for "{instrument}" is available on {date}.',
+    'autofill.allReachedTarget': 'All eligible members for "{instrument}" reached their target count.',
+    'autofill.conflictPrevented': 'Conflict prevented assignment for "{instrument}".',
+    'autofill.positionsUnfilled': '{count} position(s) unfilled.',
   },
   'pt-BR': {
-    'app.title': 'Gerador de Escalas de Ministério de Louvor',
+    'app.title': 'Worship Scheduler',
 
     'actions.export': 'Exportar',
     'actions.import': 'Importar',
@@ -151,6 +157,12 @@ const MESSAGES: Record<Lang, Messages> = {
     'review.date': 'Data',
     'review.export': 'Exportar como Imagem',
     'review.noSchedules': 'Nenhuma escala disponível para revisar.',
+
+    'autofill.noMemberPlays': 'Nenhum membro toca "{instrument}".',
+    'autofill.noEligibleMember': 'Nenhum membro elegível para "{instrument}" está disponível em {date}.',
+    'autofill.allReachedTarget': 'Todos os membros elegíveis para "{instrument}" atingiram sua quantidade desejada.',
+    'autofill.conflictPrevented': 'Conflito impediu atribuição para "{instrument}".',
+    'autofill.positionsUnfilled': '{count} posição(ões) não preenchida(s).',
   },
 }
 

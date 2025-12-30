@@ -107,7 +107,7 @@ export function SelectValue({ placeholder }: { placeholder?: string }) {
   const ctx = React.useContext(SelectContext)
   const label = ctx?.valueLabel && ctx.value ? ctx.valueLabel : ctx?.getLabel(ctx?.value || '')
   return (
-    <div className="h-9 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 flex items-center text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+    <div className="h-9 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-400 flex items-center text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis shadow-sm transition-all duration-200 hover:border-gray-400 cursor-pointer">
       {ctx?.value ? (label ?? ctx.value) : placeholder || 'Select'}
     </div>
   )
@@ -120,7 +120,7 @@ export function SelectContent({ children, className, ...rest }: React.HTMLAttrib
   return (
     <div
       className={cn(
-        'absolute z-10 mt-1 min-w-[12rem] w-max rounded-xl border border-gray-200 bg-white shadow',
+        'absolute z-10 mt-1 min-w-[12rem] w-max rounded-xl border border-gray-200 bg-white shadow-lg',
         className
       )}
       {...rest}
