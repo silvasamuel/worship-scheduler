@@ -89,7 +89,7 @@ export default function ReviewPanel({ schedules, members }: Props) {
 
   if (schedules.length === 0) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-500 dark:text-gray-400 py-8">
         <p>{t('review.noSchedules')}</p>
       </div>
     )
@@ -100,7 +100,7 @@ export default function ReviewPanel({ schedules, members }: Props) {
       <div className="flex justify-end">
         <button
           onClick={exportAsImage}
-          className="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+          className="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
         >
           {t('review.export')}
         </button>
@@ -108,21 +108,24 @@ export default function ReviewPanel({ schedules, members }: Props) {
 
       <div
         ref={reviewRef}
-        className="bg-white p-6 rounded-lg shadow-sm"
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm"
         style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
       >
-        <h2 className="text-2xl font-bold mb-6 text-gray-900">{t('review.title')}</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">{t('review.title')}</h2>
 
         <table className="w-full border-collapse" style={{ fontSize: '14px' }}>
           <thead>
-            <tr className="border-b-2 border-gray-300">
-              <th className="text-left py-3 px-4 font-semibold text-gray-900" style={{ minWidth: '120px' }}>
+            <tr className="border-b-2 border-gray-300 dark:border-gray-700">
+              <th
+                className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-gray-100"
+                style={{ minWidth: '120px' }}
+              >
                 {t('review.date')}
               </th>
               {instruments.map(instrument => (
                 <th
                   key={instrument}
-                  className="text-left py-3 px-4 font-semibold text-gray-900"
+                  className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-gray-100"
                   style={{ minWidth: '100px' }}
                 >
                   {instrumentLabel(instrument)}
@@ -134,21 +137,22 @@ export default function ReviewPanel({ schedules, members }: Props) {
             {schedules.map((schedule, idx) => (
               <tr
                 key={schedule.id}
-                className={idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
-                style={{ borderBottom: '1px solid #e5e7eb' }}
+                className={`${idx % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} border-b border-gray-200 dark:border-gray-700`}
               >
-                <td className="py-3 px-4 font-medium text-gray-900">{dayLabel(schedule.date, locale)}</td>
+                <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">
+                  {dayLabel(schedule.date, locale)}
+                </td>
                 {instruments.map(instrument => {
                   const assignments = getAssignmentsForInstrument(schedule, instrument)
                   if (assignments.length === 0) {
                     return (
-                      <td key={instrument} className="py-3 px-4 text-gray-500">
+                      <td key={instrument} className="py-3 px-4 text-gray-500 dark:text-gray-400">
                         —
                       </td>
                     )
                   }
                   return (
-                    <td key={instrument} className="py-3 px-4 text-gray-900">
+                    <td key={instrument} className="py-3 px-4 text-gray-900 dark:text-gray-100">
                       {assignments.map((assignment, i) => (
                         <div key={assignment.id}>
                           {getMemberName(assignment.memberId)}
@@ -165,9 +169,9 @@ export default function ReviewPanel({ schedules, members }: Props) {
 
         {/* Statistics Section */}
         {memberStats.length > 0 && (
-          <div className="mt-8 pt-6 border-t-2 border-gray-300">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">{t('statistics.title')}</h3>
-            <div className="text-sm text-gray-600 mb-4">{t('statistics.description')}</div>
+          <div className="mt-8 pt-6 border-t-2 border-gray-300 dark:border-gray-700">
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">{t('statistics.title')}</h3>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">{t('statistics.description')}</div>
 
             <div className="space-y-3">
               {memberStats.map(stat => {
@@ -178,7 +182,7 @@ export default function ReviewPanel({ schedules, members }: Props) {
                 return (
                   <div key={stat.member.id} className="flex items-center gap-3">
                     <div
-                      className="min-w-[140px] text-sm font-medium text-gray-700 whitespace-nowrap"
+                      className="min-w-[140px] text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
                       title={stat.member.name}
                     >
                       {stat.member.name}
@@ -193,7 +197,7 @@ export default function ReviewPanel({ schedules, members }: Props) {
                             {stat.count > 0 && <span className="text-xs font-semibold text-white">{stat.count}</span>}
                           </div>
                         </div>
-                        <div className="text-sm text-gray-600 min-w-[3rem] text-right whitespace-nowrap">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 min-w-[3rem] text-right whitespace-nowrap">
                           {stat.count} {stat.count === 1 ? t('statistics.schedule') : t('statistics.schedules')}
                         </div>
                       </div>

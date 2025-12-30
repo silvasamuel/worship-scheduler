@@ -26,7 +26,7 @@ export function ConfirmDialog({
   return (
     <Modal open={open} onOpenChange={onOpenChange} title={title}>
       <div className="space-y-4">
-        {description && <div className="text-sm text-gray-700">{description}</div>}
+        {description && <div className="text-sm text-gray-700 dark:text-gray-300">{description}</div>}
         <div className="flex justify-end gap-2">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             {cancelLabel}

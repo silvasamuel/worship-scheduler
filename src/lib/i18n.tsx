@@ -59,6 +59,9 @@ const MESSAGES: Record<Lang, Messages> = {
     'language.portuguese': 'Português (BR)',
     'language.label': 'Language',
 
+    'theme.dark': 'Dark mode',
+    'theme.light': 'Light mode',
+
     'tabs.members': 'Members',
     'tabs.schedules': 'Schedules',
     'tabs.statistics': 'Statistics',
@@ -73,6 +76,8 @@ const MESSAGES: Record<Lang, Messages> = {
     'statistics.totalSchedules': 'Total Schedules',
     'statistics.totalAssignments': 'Total Assignments',
     'statistics.averagePerMember': 'Average per Member',
+    'statistics.expand': 'Expand',
+    'statistics.collapse': 'Collapse',
 
     'review.title': 'Worship Team Schedules',
     'review.date': 'Date',
@@ -138,6 +143,9 @@ const MESSAGES: Record<Lang, Messages> = {
     'language.portuguese': 'Português (BR)',
     'language.label': 'Idioma',
 
+    'theme.dark': 'Modo escuro',
+    'theme.light': 'Modo claro',
+
     'tabs.members': 'Membros',
     'tabs.schedules': 'Escalas',
     'tabs.statistics': 'Estatísticas',
@@ -152,6 +160,8 @@ const MESSAGES: Record<Lang, Messages> = {
     'statistics.totalSchedules': 'Total de Escalas',
     'statistics.totalAssignments': 'Total de Atribuições',
     'statistics.averagePerMember': 'Média por Membro',
+    'statistics.expand': 'Expandir',
+    'statistics.collapse': 'Recolher',
 
     'review.title': 'Escalas do Ministério de Louvor',
     'review.date': 'Data',

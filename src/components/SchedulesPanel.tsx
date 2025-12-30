@@ -87,8 +87,8 @@ export default function SchedulesPanel({
     <Card className="shadow-md">
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-6">
-          <CalendarPlus className="w-5 h-5 text-gray-700" />
-          <h2 className="text-lg font-bold text-gray-900">{t('schedules.title')}</h2>
+          <CalendarPlus className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">{t('schedules.title')}</h2>
         </div>
 
         <div className="grid md:grid-cols-[auto_auto_1fr_auto] gap-3 mb-3 items-start">
@@ -101,7 +101,7 @@ export default function SchedulesPanel({
                 onFocus={openDatePicker}
                 onClick={openDatePicker}
                 lang={locale}
-                className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400"
+                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
               />
             </div>
             <span ref={addScheduleWrapperRef} className="relative inline-block" onClick={maybeShowScheduleTooltip}>
@@ -143,7 +143,7 @@ export default function SchedulesPanel({
               </span>
             </Button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 order-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 order-3 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
             {[...INSTRUMENTS]
               .sort((a, b) => a.localeCompare(b))
               .map(inst => {
@@ -152,7 +152,7 @@ export default function SchedulesPanel({
                   <button
                     key={inst}
                     type="button"
-                    className={`rounded-xl border px-3 py-2 text-sm text-center w-full ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-900 hover:bg-gray-50'}`}
+                    className={`rounded-xl border px-3 py-2 text-sm text-center w-full transition-all duration-200 shadow-sm hover:shadow-md ${active ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-gray-900 dark:border-gray-100 shadow-md' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-300 dark:border-gray-700'}`}
                     onClick={() => setSInstruments(prev => (active ? prev.filter(i => i !== inst) : [...prev, inst]))}
                   >
                     {instrumentLabel(inst)}
@@ -163,11 +163,11 @@ export default function SchedulesPanel({
         </div>
 
         <div className="space-y-3">
-          {schedules.length === 0 && <p className="text-sm text-gray-500">{t('schedules.empty')}</p>}
+          {schedules.length === 0 && <p className="text-sm text-gray-500 dark:text-gray-400">{t('schedules.empty')}</p>}
           {schedules.map(s => (
             <div
               key={s.id}
-              className="rounded-2xl border border-gray-200/60 p-4 bg-gradient-to-br from-white to-gray-50/50 shadow-sm hover:shadow-md transition-all duration-200"
+              className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-4 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               <div className="flex items-center gap-2">
                 <div className="font-semibold">{dayLabel(s.date, locale)}</div>
@@ -190,10 +190,12 @@ export default function SchedulesPanel({
                   return (
                     <div
                       key={slot.id}
-                      className="flex items-center gap-2 bg-white border border-gray-200/60 rounded-xl p-3 shadow-sm"
+                      className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/60 rounded-xl p-3 shadow-sm"
                     >
-                      <Music className="w-4 h-4" />
-                      <span className="text-sm font-medium mr-1">{instrumentLabel(slot.instrument)}</span>
+                      <Music className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                      <span className="text-sm font-medium mr-1 text-gray-900 dark:text-gray-100">
+                        {instrumentLabel(slot.instrument)}
+                      </span>
                       <Select
                         value={slot.memberId || ''}
                         onValueChange={v => onSetAssign(s.id, slot.id, v || undefined)}

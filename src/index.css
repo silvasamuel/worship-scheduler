@@ -16,4 +16,8 @@ body,
   body {
     @apply antialiased;
   }
+
+  .dark {
+    color-scheme: dark;
+  }
 }

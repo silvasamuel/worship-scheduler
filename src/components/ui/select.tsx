@@ -107,7 +107,7 @@ export function SelectValue({ placeholder }: { placeholder?: string }) {
   const ctx = React.useContext(SelectContext)
   const label = ctx?.valueLabel && ctx.value ? ctx.valueLabel : ctx?.getLabel(ctx?.value || '')
   return (
-    <div className="h-9 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-400 flex items-center text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis shadow-sm transition-all duration-200 hover:border-gray-400 cursor-pointer">
+    <div className="h-9 w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 px-3 py-2 text-sm ring-offset-white dark:ring-offset-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500 flex items-center text-gray-900 dark:text-gray-100 whitespace-nowrap overflow-hidden text-ellipsis shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600 cursor-pointer">
       {ctx?.value ? (label ?? ctx.value) : placeholder || 'Select'}
     </div>
   )
@@ -120,7 +120,7 @@ export function SelectContent({ children, className, ...rest }: React.HTMLAttrib
   return (
     <div
       className={cn(
-        'absolute z-10 mt-1 min-w-[12rem] w-max rounded-xl border border-gray-200 bg-white shadow-lg',
+        'absolute z-10 mt-1 min-w-[12rem] w-max rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg',
         className
       )}
       {...rest}
@@ -141,8 +141,8 @@ export function SelectItem({ value, children }: { value: string; children?: Reac
   return (
     <div
       className={cn(
-        'cursor-pointer select-none rounded-lg px-3 py-1.5 text-sm hover:bg-gray-100',
-        selected && 'bg-gray-100'
+        'cursor-pointer select-none rounded-lg px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100',
+        selected && 'bg-gray-100 dark:bg-gray-700'
       )}
       onClick={() => {
         ctx?.setValue(value)
