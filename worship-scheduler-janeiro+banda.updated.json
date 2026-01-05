@@ -1,0 +1,566 @@
+{
+  "members": [
+    {
+      "id": "64de3d725d75c70008f08675",
+      "louveUserId": "64de3d725d75c70008f08675",
+      "name": "Ana Clara",
+      "instruments": ["vocalista", "ministro", "mesa de som", "mídia", "backing"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "ministro": "5f31e5ca7803d600172af723",
+        "mesa de som": "5f31e6377803d600172af72f",
+        "mídia": "64ed5ae519c9940008c3159a",
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "6928f8576c8fbbba8b6f6a9a",
+      "louveUserId": "6928f8576c8fbbba8b6f6a9a",
+      "name": "André Bornhausen",
+      "instruments": ["backing"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "64ee0c008e9ef80008e7852e",
+      "louveUserId": "64ee0c008e9ef80008e7852e",
+      "name": "Davi Gonçalves",
+      "instruments": ["bateria", "mesa de som"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "bateria": "5f31e5ed7803d600172af727",
+        "mesa de som": "5f31e6377803d600172af72f"
+      }
+    },
+    {
+      "id": "67507447a6d3a10008392b1b",
+      "louveUserId": "67507447a6d3a10008392b1b",
+      "name": "Emanuely Victoria",
+      "instruments": ["vocalista", "mesa de som", "mídia", "backing"],
+      "availability": "weekends",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "mesa de som": "5f31e6377803d600172af72f",
+        "mídia": "64ed5ae519c9940008c3159a",
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "653d91a5d75c600008f09469",
+      "louveUserId": "653d91a5d75c600008f09469",
+      "name": "Gabriel Henrique",
+      "instruments": ["guitarra", "mesa de som", "mídia"],
+      "availability": "weekends",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "guitarra": "5f31e5db7803d600172af725",
+        "mesa de som": "5f31e6377803d600172af72f",
+        "mídia": "64ed5ae519c9940008c3159a"
+      }
+    },
+    {
+      "id": "686c1f125dda6a376f8ca2c8",
+      "louveUserId": "686c1f125dda6a376f8ca2c8",
+      "name": "Gil Perroud",
+      "instruments": ["baixo", "mesa de som"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "baixo": "5f31e5e47803d600172af726",
+        "mesa de som": "5f31e6377803d600172af72f"
+      }
+    },
+    {
+      "id": "654480bcf93170000839495e",
+      "louveUserId": "654480bcf93170000839495e",
+      "name": "Gilmar Santos",
+      "instruments": ["violão"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "violão": "5f31e5d27803d600172af724"
+      }
+    },
+    {
+      "id": "68e1bf5a445e5a84f3e3c333",
+      "louveUserId": "68e1bf5a445e5a84f3e3c333",
+      "name": "Hillary Pimenta",
+      "instruments": ["mídia"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "mídia": "64ed5ae519c9940008c3159a"
+      }
+    },
+    {
+      "id": "686bf3d59e98c2e51b3bd959",
+      "louveUserId": "686bf3d59e98c2e51b3bd959",
+      "name": "Jackson Silva de Souza",
+      "instruments": ["mesa de som"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "mesa de som": "5f31e6377803d600172af72f"
+      }
+    },
+    {
+      "id": "6548ee310fea5f0008106925",
+      "louveUserId": "6548ee310fea5f0008106925",
+      "name": "Johan",
+      "instruments": ["vocalista", "violão", "baixo"],
+      "availability": "weekends",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "violão": "5f31e5d27803d600172af724",
+        "baixo": "5f31e5e47803d600172af726"
+      }
+    },
+    {
+      "id": "64ee5d025c3a580008630586",
+      "louveUserId": "64ee5d025c3a580008630586",
+      "name": "Juliano Henrique",
+      "instruments": ["vocalista", "ministro", "violão", "baixo", "backing"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": true,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "ministro": "5f31e5ca7803d600172af723",
+        "violão": "5f31e5d27803d600172af724",
+        "baixo": "5f31e5e47803d600172af726",
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "64ee06f1c80a060008d79969",
+      "louveUserId": "64ee06f1c80a060008d79969",
+      "name": "Marcos Matheus",
+      "instruments": ["vocalista", "violão", "guitarra", "baixo", "bateria", "backing"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": true,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "violão": "5f31e5d27803d600172af724",
+        "guitarra": "5f31e5db7803d600172af725",
+        "baixo": "5f31e5e47803d600172af726",
+        "bateria": "5f31e5ed7803d600172af727",
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "6838e268acde4d79eabd6045",
+      "louveUserId": "6838e268acde4d79eabd6045",
+      "name": "Nathaly Patricio",
+      "instruments": ["backing"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "64dc22c1356d5800088328d9",
+      "louveUserId": "64dc22c1356d5800088328d9",
+      "name": "Samuel Silva",
+      "instruments": ["vocalista", "ministro", "violão", "baixo", "teclado", "backing"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": true,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "ministro": "5f31e5ca7803d600172af723",
+        "violão": "5f31e5d27803d600172af724",
+        "baixo": "5f31e5e47803d600172af726",
+        "teclado": "5f31e5fd7803d600172af728",
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "6853536dc01c8104d4cfd8e1",
+      "louveUserId": "6853536dc01c8104d4cfd8e1",
+      "name": "Solange Patrício",
+      "instruments": ["vocalista", "backing"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "660af79c2d05d1000775fc1e",
+      "louveUserId": "660af79c2d05d1000775fc1e",
+      "name": "Tauyli Costa",
+      "instruments": ["vocalista", "backing"],
+      "availability": "weekends",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "vocalista": "5f31e1d17803d600172af717",
+        "backing": "64eeab19479eee0008490f98"
+      }
+    },
+    {
+      "id": "64ee59c765019c0008bec0d6",
+      "louveUserId": "64ee59c765019c0008bec0d6",
+      "name": "Wendel Guilherme",
+      "instruments": ["bateria", "mesa de som"],
+      "availability": "both",
+      "targetCount": 6,
+      "assignedCount": 0,
+      "canSingAndPlay": false,
+      "louveFunctionsByInstrument": {
+        "bateria": "5f31e5ed7803d600172af727",
+        "mesa de som": "5f31e6377803d600172af72f"
+      }
+    }
+  ],
+  "schedules": [
+    {
+      "id": "0a9029b8-11a9-47b6-a464-196df91bbd05",
+      "name": "DOMINGO DE CELEBRAÇÃO",
+      "date": "2026-01-04",
+      "time": "09:00",
+      "requiredInstruments": ["vocalista", "baixo", "bateria", "guitarra", "mesa de som", "mídia", "violão"],
+      "assignments": [
+        {
+          "id": "f2227d55-b532-40d2-b460-940df3bd6edc",
+          "instrument": "vocalista",
+          "memberId": "64ee5d025c3a580008630586"
+        },
+        { "id": "3ee98cdb-e0b9-4dfe-bcec-116457c37358", "instrument": "baixo", "memberId": "64ee06f1c80a060008d79969" },
+        {
+          "id": "982a207c-8b17-4cea-96b0-7eedb0cbc183",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "2151dde0-cfd8-4b02-8700-00c6c0333aa6",
+          "instrument": "guitarra",
+          "memberId": "653d91a5d75c600008f09469"
+        },
+        {
+          "id": "147a2afc-6ad9-4b57-952b-7a44f712ada0",
+          "instrument": "mesa de som",
+          "memberId": "686bf3d59e98c2e51b3bd959"
+        },
+        { "id": "e9260647-181e-4b49-8f2f-0e0dd1a3746f", "instrument": "mídia", "memberId": "67507447a6d3a10008392b1b" },
+        { "id": "0aa09e8a-8a2f-4f45-9a4b-6d2aa2c4b7b4", "instrument": "violão", "memberId": "64ee5d025c3a580008630586" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "b3efa5dc-02c8-4a18-a795-cf9139c7ed90",
+      "name": "QUINTA DE CRESCIMENTO",
+      "date": "2026-01-08",
+      "time": "19:30",
+      "requiredInstruments": ["vocalista", "backing", "bateria", "mesa de som", "violão"],
+      "assignments": [
+        {
+          "id": "4c62c192-379f-409e-a6cf-9de1d9932619",
+          "instrument": "vocalista",
+          "memberId": "64de3d725d75c70008f08675"
+        },
+        {
+          "id": "be68b34a-e005-4252-b9db-6ff3f7d5cdf4",
+          "instrument": "backing",
+          "memberId": "6928f8576c8fbbba8b6f6a9a"
+        },
+        {
+          "id": "fcaa1720-f1d7-41b1-b430-eb937baf6b03",
+          "instrument": "bateria",
+          "memberId": "64ee59c765019c0008bec0d6"
+        },
+        {
+          "id": "0b6ae4f4-094b-4a6d-81bd-05c8e9162477",
+          "instrument": "mesa de som",
+          "memberId": "686c1f125dda6a376f8ca2c8"
+        },
+        { "id": "a703894f-303b-4b47-b3a8-872fbabe27c6", "instrument": "violão", "memberId": "64dc22c1356d5800088328d9" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "75af6372-8a99-417b-933c-963c485bbee7",
+      "name": "DOMINGO DE CELEBRAÇÃO",
+      "date": "2026-01-11",
+      "time": "09:00",
+      "requiredInstruments": ["vocalista", "backing", "baixo", "bateria", "guitarra", "mesa de som", "mídia", "violão"],
+      "assignments": [
+        {
+          "id": "a7984b19-30f8-4b88-90ca-5fee90339455",
+          "instrument": "vocalista",
+          "memberId": "64dc22c1356d5800088328d9"
+        },
+        {
+          "id": "2e51d47d-5646-4fd5-91a8-30caba3e5ad5",
+          "instrument": "backing",
+          "memberId": "67507447a6d3a10008392b1b"
+        },
+        { "id": "0dc822ce-6760-4f85-b147-a81e45aa8683", "instrument": "baixo", "memberId": "6548ee310fea5f0008106925" },
+        {
+          "id": "e1e62734-5a89-4e27-ab19-bdf2a88bc05d",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "e7d9dfe0-380e-4298-8c5e-9105e00706d0",
+          "instrument": "guitarra",
+          "memberId": "653d91a5d75c600008f09469"
+        },
+        {
+          "id": "79aa8212-7d0a-49ca-afb6-a59515c19141",
+          "instrument": "mesa de som",
+          "memberId": "64ee59c765019c0008bec0d6"
+        },
+        { "id": "434de63f-75c8-4e54-9b68-d8e6fbaa2ad8", "instrument": "mídia", "memberId": "64de3d725d75c70008f08675" },
+        { "id": "17a7e02c-2081-4890-8202-394b110e02b0", "instrument": "violão", "memberId": "64dc22c1356d5800088328d9" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "c22cf7c6-6e7a-45ba-bf34-3d13d827787b",
+      "name": "QUINTA DE CRESCIMENTO",
+      "date": "2026-01-15",
+      "time": "19:30",
+      "requiredInstruments": ["vocalista", "bateria", "mesa de som", "violão"],
+      "assignments": [
+        {
+          "id": "4e3f858a-9207-4f70-b55c-e8dddbb1f7f0",
+          "instrument": "vocalista",
+          "memberId": "64de3d725d75c70008f08675"
+        },
+        {
+          "id": "651247eb-a0bc-489f-802c-fee04acab878",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "896ca9a2-6821-4ee1-ad58-4ce4351f099a",
+          "instrument": "mesa de som",
+          "memberId": "64ee59c765019c0008bec0d6"
+        },
+        { "id": "c246be9a-05e0-4cea-ba1c-1f57fa89a3b0", "instrument": "violão", "memberId": "64dc22c1356d5800088328d9" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "333c6c5c-a736-4dc1-9fd1-d7c133ea7d1e",
+      "name": "DOMINGO DE CELEBRAÇÃO",
+      "date": "2026-01-18",
+      "time": "09:00",
+      "requiredInstruments": ["vocalista", "backing", "baixo", "bateria", "guitarra", "mesa de som", "mídia", "violão"],
+      "assignments": [
+        {
+          "id": "0a6b6563-f38c-40f5-a6ac-6e73ac467861",
+          "instrument": "vocalista",
+          "memberId": "64de3d725d75c70008f08675"
+        },
+        {
+          "id": "7f6d453d-a51a-45e8-b9a8-ebed348b851a",
+          "instrument": "backing",
+          "memberId": "660af79c2d05d1000775fc1e"
+        },
+        { "id": "3459d1e8-3952-4074-8245-b4a6e97cc616", "instrument": "baixo", "memberId": "686c1f125dda6a376f8ca2c8" },
+        {
+          "id": "6c9cd699-9901-4c45-846d-7c5a1f6dc452",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "80ffd044-891e-4797-b419-b575842a0c7a",
+          "instrument": "guitarra",
+          "memberId": "653d91a5d75c600008f09469"
+        },
+        {
+          "id": "b7664b40-b246-4765-b911-1c5abc902e8a",
+          "instrument": "mesa de som",
+          "memberId": "64ee59c765019c0008bec0d6"
+        },
+        { "id": "92519eaa-b1a0-4ecb-83aa-a4d6c94043da", "instrument": "mídia", "memberId": "67507447a6d3a10008392b1b" },
+        { "id": "0272bd4d-f77e-4977-9637-5178bf709d00", "instrument": "violão", "memberId": "64ee5d025c3a580008630586" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "511bfb35-43ee-4f66-8015-cd6f0a93bf68",
+      "name": "QUINTA DE CRESCIMENTO",
+      "date": "2026-01-22",
+      "time": "19:30",
+      "requiredInstruments": ["vocalista", "backing", "bateria", "mesa de som", "mídia", "violão"],
+      "assignments": [
+        {
+          "id": "62f76120-bc1c-4e3e-b19b-21724f4cd910",
+          "instrument": "vocalista",
+          "memberId": "64ee5d025c3a580008630586"
+        },
+        {
+          "id": "fb0b9e42-d031-4d7c-b716-a9d86309982d",
+          "instrument": "backing",
+          "memberId": "6853536dc01c8104d4cfd8e1"
+        },
+        {
+          "id": "d265cc10-b69f-45da-b32d-a8582a180708",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "9ff7943d-9c12-48c5-946e-74dda67afc4f",
+          "instrument": "mesa de som",
+          "memberId": "686c1f125dda6a376f8ca2c8"
+        },
+        { "id": "ea509de5-b79d-4320-b7a4-4ec749e48cc9", "instrument": "mídia", "memberId": "64de3d725d75c70008f08675" },
+        { "id": "d71fc643-89e4-4dbd-9434-b17e692bbfa5", "instrument": "violão", "memberId": "64ee5d025c3a580008630586" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "d84c3ed4-8b02-4ec6-ad0e-0257f428de15",
+      "name": "DOMINGO DE CELEBRAÇÃO",
+      "date": "2026-01-25",
+      "time": "09:00",
+      "requiredInstruments": ["vocalista", "backing", "baixo", "bateria", "guitarra", "mesa de som", "mídia", "violão"],
+      "assignments": [
+        {
+          "id": "695d7416-9eba-4115-966d-123a51311c01",
+          "instrument": "vocalista",
+          "memberId": "64ee06f1c80a060008d79969"
+        },
+        {
+          "id": "373e8a69-d4a6-4ab6-87df-5b69514c35bb",
+          "instrument": "backing",
+          "memberId": "6853536dc01c8104d4cfd8e1"
+        },
+        { "id": "8db29526-bab5-449f-ad57-619a33fb1a10", "instrument": "baixo", "memberId": "64ee5d025c3a580008630586" },
+        {
+          "id": "4a65fc37-d067-43dc-9672-b14ae6ddf01c",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "8591da08-2dc4-4e8c-8789-7ad9442161d5",
+          "instrument": "guitarra",
+          "memberId": "653d91a5d75c600008f09469"
+        },
+        {
+          "id": "845bdcfa-ab0e-470a-a3ec-e0bb546c9882",
+          "instrument": "mesa de som",
+          "memberId": "64ee59c765019c0008bec0d6"
+        },
+        { "id": "3b076274-f8dc-49aa-a311-c0a42e877ffa", "instrument": "mídia", "memberId": "67507447a6d3a10008392b1b" },
+        { "id": "0d9ce312-4c6d-4cc8-9c4a-9b67b5b41a17", "instrument": "violão", "memberId": "64ee06f1c80a060008d79969" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "286f764e-65a1-4087-b7f4-3519174f7ab5",
+      "name": "QUINTA DE CRESCIMENTO",
+      "date": "2026-01-29",
+      "time": "19:30",
+      "requiredInstruments": ["vocalista", "bateria", "mesa de som", "violão"],
+      "assignments": [
+        {
+          "id": "0f5087bb-352d-4a54-bcf0-f255a3f90a0e",
+          "instrument": "vocalista",
+          "memberId": "64de3d725d75c70008f08675"
+        },
+        {
+          "id": "23b973df-65e2-4ba0-9c42-6b40752dcba3",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "385f1c0e-b285-4fac-b409-bc322e4a26a6",
+          "instrument": "mesa de som",
+          "memberId": "686c1f125dda6a376f8ca2c8"
+        },
+        { "id": "7cb0e7ca-7e4f-4172-821d-f4729ebd8a70", "instrument": "violão", "memberId": "64ee06f1c80a060008d79969" }
+      ],
+      "status": "complete",
+      "issues": []
+    },
+    {
+      "id": "1c91da1e-b38e-4d75-8b20-ae8c1ce1bc5a",
+      "name": "DOMINGO DE CELEBRAÇÃO",
+      "date": "2026-02-01",
+      "time": "09:00",
+      "requiredInstruments": ["vocalista", "backing", "baixo", "bateria", "guitarra", "mesa de som", "mídia", "violão"],
+      "assignments": [
+        {
+          "id": "1642ed92-65b1-46c4-8e37-5dc8db6a4d7e",
+          "instrument": "vocalista",
+          "memberId": "64ee06f1c80a060008d79969"
+        },
+        {
+          "id": "81b8e740-e81e-48d5-b522-5dc4469417e6",
+          "instrument": "backing",
+          "memberId": "660af79c2d05d1000775fc1e"
+        },
+        { "id": "074dbad5-ea59-45af-b36c-cf35b86b57c7", "instrument": "baixo", "memberId": "64ee5d025c3a580008630586" },
+        {
+          "id": "bc20c870-94d8-4589-9aa2-b63bb93bb2eb",
+          "instrument": "bateria",
+          "memberId": "64ee0c008e9ef80008e7852e"
+        },
+        {
+          "id": "2af1a091-ab02-4a05-b6f7-8009fcb2f586",
+          "instrument": "guitarra",
+          "memberId": "653d91a5d75c600008f09469"
+        },
+        {
+          "id": "da06a2d0-6182-4d05-a20e-586b3eb3bfc3",
+          "instrument": "mesa de som",
+          "memberId": "64ee59c765019c0008bec0d6"
+        },
+        { "id": "d6884343-6158-46fd-a836-b9dd29d8f0dd", "instrument": "mídia", "memberId": "67507447a6d3a10008392b1b" },
+        { "id": "19a30e90-f5f2-4790-b063-8edc43ee51da", "instrument": "violão", "memberId": "64ee06f1c80a060008d79969" }
+      ],
+      "status": "complete",
+      "issues": []
+    }
+  ]
+}

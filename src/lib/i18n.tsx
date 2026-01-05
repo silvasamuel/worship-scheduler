@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from 'react'
 import { norm } from '@/lib/instruments'
 
@@ -37,9 +38,13 @@ const MESSAGES: Record<Lang, Messages> = {
     'schedules.unselectAll': 'Unselect All',
     'schedules.add': 'Add Schedule',
     'schedules.empty': 'No schedules yet. Add a date and instruments above.',
-    'schedules.tooltip.add': 'Select a date and at least one instrument',
+    'schedules.tooltip.add': 'Enter a date, name, and at least one instrument',
+    'schedules.namePlaceholder': 'Schedule name (e.g. Sunday Night)',
     'schedules.addInstrument': 'Add instrument...',
     'schedules.removeSlot': 'Remove slot',
+    'schedules.generateMonth': 'Generate Month',
+    'schedules.month': 'Month',
+    'schedules.generate': 'Generate',
 
     'status.complete': 'Complete',
     'status.partial': 'Partial',
@@ -82,6 +87,14 @@ const MESSAGES: Record<Lang, Messages> = {
     'review.title': 'Worship Team Schedules',
     'review.date': 'Date',
     'review.export': 'Export as Image',
+    'review.sync': 'Sync to Louveapp',
+    'review.sync.title': 'Sync schedules to Louveapp',
+    'review.sync.token': 'Bearer token',
+    'review.sync.ministryId': 'Ministry ID',
+    'review.sync.onlyComplete': 'Only sync complete schedules',
+    'review.sync.start': 'Start Sync',
+    'review.sync.close': 'Close',
+    'review.sync.running': 'Syncing…',
     'review.noSchedules': 'No schedules available to review.',
 
     'autofill.noMemberPlays': 'No member plays "{instrument}".',
@@ -121,9 +134,13 @@ const MESSAGES: Record<Lang, Messages> = {
     'schedules.unselectAll': 'Desmarcar Todos',
     'schedules.add': 'Adicionar Escala',
     'schedules.empty': 'Nenhuma escala ainda. Adicione uma data e instrumentos acima.',
-    'schedules.tooltip.add': 'Selecione uma data e pelo menos um instrumento',
+    'schedules.tooltip.add': 'Informe data, nome e selecione pelo menos um instrumento',
+    'schedules.namePlaceholder': 'Nome da escala (ex. Culto Noite)',
     'schedules.addInstrument': 'Adicionar instrumento...',
     'schedules.removeSlot': 'Remover slot',
+    'schedules.generateMonth': 'Gerar Mês',
+    'schedules.month': 'Mês',
+    'schedules.generate': 'Gerar',
 
     'status.complete': 'Completa',
     'status.partial': 'Parcial',
@@ -166,6 +183,14 @@ const MESSAGES: Record<Lang, Messages> = {
     'review.title': 'Escalas do Ministério de Louvor',
     'review.date': 'Data',
     'review.export': 'Exportar como Imagem',
+    'review.sync': 'Sincronizar com Louveapp',
+    'review.sync.title': 'Sincronizar escalas com Louveapp',
+    'review.sync.token': 'Bearer token',
+    'review.sync.ministryId': 'ID do Ministério',
+    'review.sync.onlyComplete': 'Sincronizar somente escalas completas',
+    'review.sync.start': 'Iniciar Sincronização',
+    'review.sync.close': 'Fechar',
+    'review.sync.running': 'Sincronizando…',
     'review.noSchedules': 'Nenhuma escala disponível para revisar.',
 
     'autofill.noMemberPlays': 'Nenhum membro toca "{instrument}".',
@@ -196,14 +221,14 @@ function initialLang(): Lang {
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = React.useState<Lang>(initialLang())
-  const setLang = (l: Lang) => {
+  const setLang = React.useCallback((l: Lang) => {
     setLangState(l)
     try {
       window.localStorage.setItem(STORAGE_KEY, l)
     } catch {
       // Ignore localStorage errors (e.g., in private browsing mode)
     }
-  }
+  }, [])
   const t = React.useCallback(
     (key: string, params?: Record<string, string | number>) => {
       const dict = MESSAGES[lang] || MESSAGES.en
@@ -241,7 +266,7 @@ const INSTRUMENT_TRANSLATIONS: Record<string, Record<Lang, string>> = {
   [norm('Teclado')]: { 'pt-BR': 'Teclado', en: 'Keys' },
   [norm('Bateria')]: { 'pt-BR': 'Bateria', en: 'Drums' },
   [norm('Mídia')]: { 'pt-BR': 'Mídia', en: 'Media' },
-  [norm('Mesa')]: { 'pt-BR': 'Mesa', en: 'Sound' },
+  [norm('Mesa de Som')]: { 'pt-BR': 'Mesa de Som', en: 'Sound' },
 }
 
 export function getInstrumentLabel(lang: Lang, key: string): string {

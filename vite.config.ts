@@ -10,7 +10,17 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
-  }
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
+  server: {
+    proxy: {
+      '/louveapi': {
+        target: 'https://api-v6.louveapp.com.br',
+        changeOrigin: true,
+        secure: true,
+        rewrite: p => p.replace(/^\/louveapi/, ''),
+      },
+    },
+  },
 })

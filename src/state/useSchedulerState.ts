@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { AssignmentSlot, Member, Schedule } from '@/types'
-import { dayLabel, isWeekend } from '@/lib/date'
-import { isVocalInstrument, norm } from '@/lib/instruments'
+import { dayLabel, isWeekend, isoWeekKey } from '@/lib/date'
+import { isVocalInstrument, norm, normalizeInstrumentKey } from '@/lib/instruments'
+import { DEFAULT_MEMBERS } from '@/lib/louve-defaults'
 
 export function useSchedulerState() {
-  const [members, setMembers] = useState<Member[]>([])
+  const [members, setMembers] = useState<Member[]>(DEFAULT_MEMBERS)
   const [schedules, setSchedules] = useState<Schedule[]>([])
 
   // Derived
@@ -56,18 +57,22 @@ export function useSchedulerState() {
     setMembers(prev => prev.map(m => (m.id === updated.id ? updated : m)))
   }
 
-  function addSchedule(dateISO: string, req: string[]) {
-    const requiredInstruments = Array.from(new Set(req.map(x => x.trim().toLowerCase()).filter(x => x.length > 0)))
+  function addSchedule(dateISO: string, time: string, name: string, req: string[]) {
+    const requiredInstruments = Array.from(new Set(req.map(x => normalizeInstrumentKey(x)).filter(x => x.length > 0)))
     const assignments: AssignmentSlot[] = requiredInstruments.map(inst => ({ id: uuidv4(), instrument: inst }))
     const newSchedule: Schedule = {
       id: uuidv4(),
+      name: name.trim(),
       date: dateISO,
+      time: time.trim(),
       requiredInstruments,
       assignments,
       status: assignments.length ? 'partial' : 'empty',
       issues: [],
     }
-    setSchedules(prev => [...prev, newSchedule].sort((a, b) => a.date.localeCompare(b.date)))
+    setSchedules(prev =>
+      [...prev, newSchedule].sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
+    )
   }
 
   function removeSchedule(id: string) {
@@ -89,7 +94,7 @@ export function useSchedulerState() {
     setSchedules(prev =>
       prev.map(s => {
         if (s.id !== scheduleId) return s
-        const newSlot: AssignmentSlot = { id: uuidv4(), instrument: instrument.toLowerCase() }
+        const newSlot: AssignmentSlot = { id: uuidv4(), instrument: normalizeInstrumentKey(instrument) }
         const assignments = [...s.assignments, newSlot]
         const { status, issues } = computeStatus(assignments)
         return { ...s, assignments, status, issues }
@@ -119,6 +124,22 @@ export function useSchedulerState() {
       s.assignments.forEach(a => a.memberId && (counts[a.memberId] = (counts[a.memberId] || 0) + 1))
     )
 
+    const VOCALISTA = norm('Vocalista')
+    const ACOUSTIC_GUITAR = norm('Violão')
+
+    // Constraint: avoid same Vocalista twice in the same ISO week
+    const vocalistByWeek = new Map<string, Set<string>>() // weekKey -> memberIds
+    schedules.forEach(s => {
+      const wk = isoWeekKey(s.date)
+      s.assignments.forEach(a => {
+        if (!a.memberId) return
+        if (norm(a.instrument) !== VOCALISTA) return
+        const set = vocalistByWeek.get(wk) || new Set<string>()
+        set.add(a.memberId)
+        vocalistByWeek.set(wk, set)
+      })
+    })
+
     const canServeDate = (m: Member, dateISO: string) => {
       const weekend = isWeekend(dateISO)
       if (m.availability === 'both') return true
@@ -127,43 +148,91 @@ export function useSchedulerState() {
       return true
     }
 
-    const eligibleFor = (instrument: string, dateISO: string, takenIds: Set<string>): Member[] =>
-      members
+    const canAssignInSchedule = (scheduleAssignments: AssignmentSlot[], m: Member, instrument: string): boolean => {
+      const inst = norm(instrument)
+      const assigned = scheduleAssignments.filter(a => a.memberId === m.id).map(a => norm(a.instrument))
+      if (assigned.length === 0) return true
+
+      // Special rule: if the member is the Vocalista and can play acoustic guitar, allow Vocalista+Acoustic Guitar even if canSingAndPlay=false
+      const hasAcousticGuitarSkill = m.instruments.map(norm).includes(ACOUSTIC_GUITAR)
+      const isVocalistaPair =
+        hasAcousticGuitarSkill &&
+        ((inst === VOCALISTA && assigned.includes(ACOUSTIC_GUITAR)) ||
+          (inst === ACOUSTIC_GUITAR && assigned.includes(VOCALISTA)))
+      if (isVocalistaPair) return true
+
+      // Otherwise, only allow 2 roles if canSingAndPlay and roles are different (vocal vs instrument)
+      if (!m.canSingAndPlay) return false
+      const alreadyHasVocal = assigned.some(a => isVocalInstrument(a))
+      const alreadyHasInstrument = assigned.some(a => !isVocalInstrument(a))
+      const wantsVocal = isVocalInstrument(inst)
+      const wantsInstrument = !wantsVocal
+      if ((alreadyHasVocal && wantsVocal) || (alreadyHasInstrument && wantsInstrument)) return false
+      // Prevent stacking beyond one vocal + one instrument
+      if (alreadyHasVocal && alreadyHasInstrument) return false
+      return true
+    }
+
+    const eligibleFor = (scheduleAssignments: AssignmentSlot[], instrument: string, dateISO: string): Member[] => {
+      const inst = norm(instrument)
+      const wk = isoWeekKey(dateISO)
+      const takenVocalists = vocalistByWeek.get(wk) || new Set<string>()
+
+      return members
         .filter(m => m.instruments.map(norm).includes(norm(instrument)))
         .filter(m => canServeDate(m, dateISO))
         .filter(m => counts[m.id] < m.targetCount)
-        .filter(m => !takenIds.has(m.id))
+        .filter(m => canAssignInSchedule(scheduleAssignments, m, inst))
+        .filter(m => (inst === VOCALISTA ? !takenVocalists.has(m.id) : true))
         .sort((a, b) => counts[a.id] - counts[b.id] || a.name.localeCompare(b.name))
+    }
+
+    const enforceVocalistOnAcousticGuitar = (scheduleAssignments: AssignmentSlot[]) => {
+      const vocalistSlot = scheduleAssignments.find(a => norm(a.instrument) === VOCALISTA && a.memberId)
+      if (!vocalistSlot?.memberId) return
+      const m = members.find(mm => mm.id === vocalistSlot.memberId)
+      if (!m) return
+      const playsAcousticGuitar = m.instruments.map(norm).includes(ACOUSTIC_GUITAR)
+      if (!playsAcousticGuitar) return
+
+      const acousticGuitarSlot = scheduleAssignments.find(a => norm(a.instrument) === ACOUSTIC_GUITAR)
+      if (!acousticGuitarSlot) return
+      if (acousticGuitarSlot.memberId === m.id) return
+
+      if (acousticGuitarSlot.memberId) {
+        counts[acousticGuitarSlot.memberId] = Math.max(0, (counts[acousticGuitarSlot.memberId] || 0) - 1)
+      }
+      acousticGuitarSlot.memberId = m.id
+      counts[m.id] = (counts[m.id] || 0) + 1
+    }
 
     const updated: Schedule[] = schedules.map(s => {
-      const taken = new Set<string>()
-      const perDateByRole: Record<string, { vocal: number; instrument: number }> = {}
-      s.assignments.forEach(a => {
-        if (!a.memberId) return
-        taken.add(a.memberId)
-        const role = isVocalInstrument(a.instrument) ? 'vocal' : 'instrument'
-        perDateByRole[a.memberId] = perDateByRole[a.memberId] || { vocal: 0, instrument: 0 }
-        perDateByRole[a.memberId][role] += 1
-      })
+      const wk = isoWeekKey(s.date)
+      const newAssignments: AssignmentSlot[] = s.assignments.map(a => ({ ...a }))
 
-      const newAssignments = s.assignments.map(slot => {
-        if (slot.memberId) return slot
-        const candidates = eligibleFor(slot.instrument, s.date, taken)
-        if (candidates.length > 0) {
+      const fillUnassigned = () => {
+        for (let i = 0; i < newAssignments.length; i++) {
+          const slot = newAssignments[i]
+          if (slot.memberId) continue
+          const candidates = eligibleFor(newAssignments, slot.instrument, s.date)
+          if (candidates.length === 0) continue
           const chosen = candidates[0]
-          const role = isVocalInstrument(slot.instrument) ? 'vocal' : 'instrument'
-          const countsByRole = perDateByRole[chosen.id] || { vocal: 0, instrument: 0 }
-          if (countsByRole.vocal > 0 && countsByRole.instrument > 0) return slot
-          const chosenMember = members.find(m => m.id === chosen.id)
-          if ((countsByRole.vocal > 0 || countsByRole.instrument > 0) && !chosenMember?.canSingAndPlay) return slot
+          slot.memberId = chosen.id
           counts[chosen.id] = (counts[chosen.id] || 0) + 1
-          perDateByRole[chosen.id] = countsByRole
-          perDateByRole[chosen.id][role] += 1
-          taken.add(chosen.id)
-          return { ...slot, memberId: chosen.id }
+          if (norm(slot.instrument) === VOCALISTA) {
+            const set = vocalistByWeek.get(wk) || new Set<string>()
+            set.add(chosen.id)
+            vocalistByWeek.set(wk, set)
+          }
         }
-        return slot
-      })
+      }
+
+      // First pass: fill normally
+      fillUnassigned()
+      // Enforce: if Vocalista can play acoustic guitar, assign them to acoustic guitar too (may unassign someone else)
+      enforceVocalistOnAcousticGuitar(newAssignments)
+      // Second pass: fill any now-empty slots after enforcement
+      fillUnassigned()
 
       const missing = newAssignments.filter(a => !a.memberId)
       const issues: string[] = []
@@ -221,12 +290,41 @@ export function useSchedulerState() {
   }
 
   function importData(payload: { members: Member[]; schedules: Schedule[] }) {
-    setMembers(payload.members || [])
-    setSchedules((payload.schedules || []).sort((a, b) => a.date.localeCompare(b.date)))
+    // Migration: older exports may have different instrument keys (e.g. "mesa")
+    setMembers(
+      (payload.members || []).map(m => ({
+        ...m,
+        instruments: (m.instruments || []).map(normalizeInstrumentKey),
+      }))
+    )
+    // Migration: older exports may not include schedule.name
+    setSchedules(
+      (payload.schedules || [])
+        .map(s => ({
+          ...s,
+          requiredInstruments: (s.requiredInstruments || []).map(normalizeInstrumentKey),
+          assignments: (s.assignments || []).map(a => ({ ...a, instrument: normalizeInstrumentKey(a.instrument) })),
+          time:
+            typeof (s as Schedule).time === 'string' && (s as Schedule).time.trim().length > 0
+              ? (s as Schedule).time
+              : (() => {
+                  const d = new Date(`${s.date}T00:00:00`)
+                  const dow = d.getDay()
+                  if (dow === 0) return '09:00' // Sunday
+                  if (dow === 4) return '19:30' // Thursday
+                  return '19:30'
+                })(),
+          name:
+            typeof (s as Schedule).name === 'string' && (s as Schedule).name.trim().length > 0
+              ? (s as Schedule).name
+              : dayLabel(s.date),
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
+    )
   }
 
   function resetAll() {
-    setMembers([])
+    setMembers(DEFAULT_MEMBERS)
     setSchedules([])
   }
 

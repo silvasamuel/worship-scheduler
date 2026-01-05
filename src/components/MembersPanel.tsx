@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useRef } from 'react'
 import { Plus, Trash2, Edit2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -8,7 +9,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Availability, Member } from '@/types'
-import { INSTRUMENTS, instrumentLabelForKey } from '@/lib/instruments'
+import { INSTRUMENTS, instrumentLabelForKey, normalizeInstrumentKey } from '@/lib/instruments'
 import { useI18n } from '@/lib/i18n'
 
 type Props = {
@@ -48,18 +49,18 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
   const [eInstruments, setEInstruments] = useState<string>('')
   const [eName, setEName] = useState('')
   const [eAvailability, setEAvailability] = useState<Availability>('both')
-  const [eTarget, setETarget] = useState<number>(2)
+  const [eTarget, setETarget] = useState<number>(6)
   const [eCanSingAndPlay, setECanSingAndPlay] = useState(false)
   const [confirmRemove, setConfirmRemove] = useState<Member | null>(null)
 
   function addMember() {
     if (!canAddMember) return
-    const instruments = Array.from(new Set(mInstruments.map(x => x.trim()).filter(Boolean))).map(x => x.toLowerCase())
+    const instruments = Array.from(new Set(mInstruments.map(x => x.trim()).filter(Boolean))).map(normalizeInstrumentKey)
     onAdd({
       name: mName.trim(),
       instruments,
       availability: (mAvailability || 'both') as Availability,
-      targetCount: Math.max(0, Number(mTargetCount || 2) | 0),
+      targetCount: Math.max(0, Number(mTargetCount || 6) | 0),
       canSingAndPlay: mCanSingAndPlay,
     })
     setMName('')
@@ -99,7 +100,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
       .split(',')
       .map(x => x.trim())
       .filter(Boolean)
-      .map(x => x.toLowerCase())
+      .map(normalizeInstrumentKey)
     onUpdate({
       ...editing,
       name: eName.trim(),
@@ -166,7 +167,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
               <Input
                 type="number"
                 min={0}
-                placeholder="e.g. 2"
+                placeholder="e.g. 6"
                 value={mTargetCount as number | ''}
                 onChange={e => setMTargetCount(e.target.value === '' ? '' : parseInt(e.target.value || '0', 10))}
               />
@@ -302,7 +303,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                 <Input
                   type="number"
                   min={0}
-                  placeholder="e.g. 2"
+                  placeholder="e.g. 6"
                   value={eTarget}
                   onChange={e => setETarget(parseInt(e.target.value || '0', 10))}
                 />

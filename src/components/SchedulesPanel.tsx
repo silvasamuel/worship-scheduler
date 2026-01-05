@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Plus, CalendarPlus, Music, Trash2, Wand2, Info, X } from 'lucide-react'
+import { Plus, CalendarPlus, Music, Trash2, Wand2, Info, X, CalendarDays } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -9,11 +9,12 @@ import { INSTRUMENTS } from '@/lib/instruments'
 import { dayLabel } from '@/lib/date'
 import { useI18n } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Modal } from '@/components/ui/modal'
 
 type Props = {
   schedules: Schedule[]
   members: Member[]
-  onAddSchedule: (date: string, req: string[]) => void
+  onAddSchedule: (date: string, time: string, name: string, req: string[]) => void
   onRemoveSchedule: (id: string) => void
   onSetAssign: (scheduleId: string, slotId: string, memberId?: string) => void
   onAddSlot: (scheduleId: string, instrument: string) => void
@@ -37,19 +38,51 @@ export default function SchedulesPanel({
   eligibleForSlot,
 }: Props) {
   const { t, locale, instrumentLabel } = useI18n()
-  const [sDate, setSDate] = useState('')
+  const [sDateTime, setSDateTime] = useState('')
+  const [sName, setSName] = useState('')
   const [sInstruments, setSInstruments] = useState<string[]>([])
-  const canAddSchedule = Boolean(sDate) && sInstruments.length > 0
+  const canAddSchedule = Boolean(sDateTime) && Boolean(sName.trim()) && sInstruments.length > 0
   const [showAddScheduleTip, setShowAddScheduleTip] = useState(false)
   const [scheduleTipPlacement, setScheduleTipPlacement] = useState<'top' | 'bottom'>('top')
   const addScheduleWrapperRef = useRef<HTMLSpanElement | null>(null)
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null)
   const [addSlotValues, setAddSlotValues] = useState<Record<string, string>>({})
+  const [monthOpen, setMonthOpen] = useState(false)
+  const [monthValue, setMonthValue] = useState('')
+
+  const AUTO_SUNDAY_NAME = 'DOMINGO DE CELEBRAÇÃO'
+  const AUTO_FIRST_THURSDAY_NAME = 'FAROL DE ORAÇÃO'
+  const AUTO_THURSDAY_NAME = 'QUINTA DE CRESCIMENTO'
+
+  function autoNameForDate(dateISO: string): string | undefined {
+    if (!dateISO) return undefined
+    const d = new Date(dateISO + 'T00:00:00')
+    const dow = d.getDay() // 0=Sun ... 4=Thu
+    if (dow === 0) return AUTO_SUNDAY_NAME
+    if (dow !== 4) return undefined
+
+    // First Thursday of the month?
+    const firstOfMonth = new Date(d.getFullYear(), d.getMonth(), 1)
+    const firstDow = firstOfMonth.getDay()
+    const firstThursdayDate = 1 + ((4 - firstDow + 7) % 7)
+    return d.getDate() === firstThursdayDate ? AUTO_FIRST_THURSDAY_NAME : AUTO_THURSDAY_NAME
+  }
+
+  function maybeAutofillNameFromDate(nextDateISO: string) {
+    const nextAuto = autoNameForDate(nextDateISO)
+    if (!nextAuto) return
+    // Only overwrite if the user didn't type a custom name (empty or already one of our auto names)
+    if (!sName.trim() || [AUTO_SUNDAY_NAME, AUTO_FIRST_THURSDAY_NAME, AUTO_THURSDAY_NAME].includes(sName.trim())) {
+      setSName(nextAuto)
+    }
+  }
 
   function addSchedule() {
     if (!canAddSchedule) return
-    onAddSchedule(sDate, sInstruments)
-    setSDate('')
+    const [date, time] = sDateTime.split('T')
+    onAddSchedule(date, time || '19:30', sName, sInstruments)
+    setSDateTime('')
+    setSName('')
     setSInstruments([])
   }
 
@@ -83,6 +116,53 @@ export default function SchedulesPanel({
     window.setTimeout(() => setShowAddScheduleTip(false), 1800)
   }
 
+  function generateMonthSchedules() {
+    if (!monthValue) return
+    const [yStr, mStr] = monthValue.split('-')
+    const year = Number(yStr)
+    const month = Number(mStr) // 1-12
+    if (!year || !month) return
+
+    const existing = new Set(schedules.map(s => `${s.date}|${s.time}`))
+    let created = 0
+    let skipped = 0
+
+    const last = new Date(year, month, 0) // last day of month
+    let firstThursdayDone = false
+
+    const pad2 = (n: number) => String(n).padStart(2, '0')
+    const toISODate = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+
+    for (let day = 1; day <= last.getDate(); day++) {
+      const d = new Date(year, month - 1, day)
+      const dow = d.getDay() // 0=Sun ... 4=Thu
+      if (dow !== 0 && dow !== 4) continue
+
+      const date = toISODate(d)
+      const name =
+        dow === 0 ? 'DOMINGO DE CELEBRAÇÃO' : !firstThursdayDone ? 'FAROL DE ORAÇÃO' : 'QUINTA DE CRESCIMENTO'
+      const time = dow === 0 ? '09:00' : '19:30'
+      const key = `${date}|${time}`
+
+      if (existing.has(key)) {
+        skipped++
+        if (dow === 4 && !firstThursdayDone) firstThursdayDone = true
+        continue
+      }
+
+      const instrumentsForDate =
+        dow === 4 ? INSTRUMENTS.filter(i => !['Guitarra', 'Teclado', 'Baixo'].includes(i)) : [...INSTRUMENTS]
+      onAddSchedule(date, time, name, instrumentsForDate)
+      existing.add(key)
+      created++
+      if (dow === 4 && !firstThursdayDone) firstThursdayDone = true
+    }
+
+    setMonthOpen(false)
+    setMonthValue('')
+    alert(`${created} created, ${skipped} skipped (already existed).`)
+  }
+
   return (
     <Card className="shadow-md">
       <CardContent className="p-6">
@@ -91,47 +171,64 @@ export default function SchedulesPanel({
           <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">{t('schedules.title')}</h2>
         </div>
 
-        <div className="grid md:grid-cols-[auto_auto_1fr_auto] gap-3 mb-3 items-start">
-          <div className="flex items-center gap-2 order-1 shrink-0">
-            <div className="w-40">
-              <input
-                type="date"
-                value={sDate}
-                onChange={e => setSDate(e.target.value)}
-                onFocus={openDatePicker}
-                onClick={openDatePicker}
-                lang={locale}
-                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
-              />
-            </div>
-            <span ref={addScheduleWrapperRef} className="relative inline-block" onClick={maybeShowScheduleTooltip}>
-              <Button
-                onClick={addSchedule}
-                disabled={!canAddSchedule}
-                title={!canAddSchedule ? t('schedules.tooltip.add') : undefined}
-                className="gap-2 shrink-0"
-              >
-                <Plus className="w-4 h-4" />
-                {t('schedules.add')}
-              </Button>
-              {!canAddSchedule && showAddScheduleTip && (
-                <span
-                  role="tooltip"
-                  className={`pointer-events-none absolute z-30 rounded-md bg-gray-900 text-white text-xs px-2 py-1 shadow-lg border border-white/10 whitespace-nowrap ${scheduleTipPlacement === 'top' ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' : 'top-full mt-2 left-1/2 -translate-x-1/2'}`}
-                >
-                  {t('schedules.tooltip.add')}
-                  <span
-                    className={`absolute w-2 h-2 bg-gray-900 rotate-45 border border-white/10 ${scheduleTipPlacement === 'top' ? 'top-full left-1/2 -translate-x-1/2 -mt-px' : 'bottom-full left-1/2 -translate-x-1/2 -mb-px'}`}
-                  ></span>
-                </span>
-              )}
-            </span>
+        <div className="flex flex-wrap items-start gap-2 mb-3">
+          <div className="w-60">
+            <input
+              type="datetime-local"
+              value={sDateTime}
+              onChange={e => {
+                const next = e.target.value
+                setSDateTime(next)
+                const [date] = next.split('T')
+                maybeAutofillNameFromDate(date)
+              }}
+              onFocus={openDatePicker}
+              onClick={openDatePicker}
+              lang={locale}
+              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
+            />
           </div>
-          <div className="flex items-center justify-end gap-2 order-2 shrink-0">
+          <input
+            type="text"
+            value={sName}
+            onChange={e => setSName(e.target.value)}
+            placeholder={t('schedules.namePlaceholder')}
+            className="w-56 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
+          />
+          <span ref={addScheduleWrapperRef} className="relative inline-block" onClick={maybeShowScheduleTooltip}>
+            <Button
+              onClick={addSchedule}
+              disabled={!canAddSchedule}
+              title={!canAddSchedule ? t('schedules.tooltip.add') : undefined}
+              className="gap-2 shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              {t('schedules.add')}
+            </Button>
+            {!canAddSchedule && showAddScheduleTip && (
+              <span
+                role="tooltip"
+                className={`pointer-events-none absolute z-30 rounded-md bg-gray-900 text-white text-xs px-2 py-1 shadow-lg border border-white/10 whitespace-nowrap ${scheduleTipPlacement === 'top' ? 'bottom-full mb-2 left-1/2 -translate-x-1/2' : 'top-full mt-2 left-1/2 -translate-x-1/2'}`}
+              >
+                {t('schedules.tooltip.add')}
+                <span
+                  className={`absolute w-2 h-2 bg-gray-900 rotate-45 border border-white/10 ${scheduleTipPlacement === 'top' ? 'top-full left-1/2 -translate-x-1/2 -mt-px' : 'bottom-full left-1/2 -translate-x-1/2 -mb-px'}`}
+                ></span>
+              </span>
+            )}
+          </span>
+          <Button variant="secondary" onClick={() => setMonthOpen(true)} className="gap-2 shrink-0">
+            <CalendarDays className="w-4 h-4" />
+            {t('schedules.generateMonth')}
+          </Button>
+        </div>
+
+        <div className="space-y-2 mb-3">
+          <div className="flex justify-end">
             <Button
               variant="secondary"
               onClick={() => setSInstruments(prev => (prev.length === INSTRUMENTS.length ? [] : [...INSTRUMENTS]))}
-              className="gap-2 shrink-0"
+              className="gap-2"
             >
               <span className="grid">
                 <span className="col-start-1 row-start-1 whitespace-nowrap">
@@ -143,7 +240,7 @@ export default function SchedulesPanel({
               </span>
             </Button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 order-3 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
             {[...INSTRUMENTS]
               .sort((a, b) => a.localeCompare(b))
               .map(inst => {
@@ -170,7 +267,9 @@ export default function SchedulesPanel({
               className="rounded-2xl border border-gray-200/60 dark:border-gray-700/60 p-4 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50 shadow-sm hover:shadow-md transition-all duration-200"
             >
               <div className="flex items-center gap-2">
-                <div className="font-semibold">{dayLabel(s.date, locale)}</div>
+                <div className="font-semibold">
+                  {s.name} • {dayLabel(s.date, locale)} • {s.time}
+                </div>
                 <Badge
                   className={
                     s.status === 'complete' ? 'bg-green-600' : s.status === 'partial' ? 'bg-amber-500' : 'bg-gray-400'
@@ -287,6 +386,27 @@ export default function SchedulesPanel({
             }
           }}
         />
+        <Modal open={monthOpen} onOpenChange={setMonthOpen} title={t('schedules.generateMonth')}>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs text-gray-600 dark:text-gray-400">{t('schedules.month')}</label>
+              <input
+                type="month"
+                value={monthValue}
+                onChange={e => setMonthValue(e.target.value)}
+                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setMonthOpen(false)}>
+                {t('actions.cancel')}
+              </Button>
+              <Button onClick={generateMonthSchedules} disabled={!monthValue}>
+                {t('schedules.generate')}
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </CardContent>
     </Card>
   )
