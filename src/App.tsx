@@ -13,6 +13,42 @@ import { norm, isVocalInstrument } from '@/lib/instruments'
 import { AssignmentSlot, Member, Schedule } from '@/types'
 import { I18nProvider, useI18n, type Lang } from '@/lib/i18n'
 import { ThemeProvider, useTheme } from '@/lib/theme'
+import LoginPanel from '@/components/LoginPanel'
+
+const AUTH_KEY = 'worship-scheduler.auth'
+const AUTH_TTL_MS = 60 * 60 * 1000 // 1 hour
+
+type AuthState = {
+  exp: number // epoch ms
+}
+
+function readAuth(): AuthState | null {
+  try {
+    const raw = window.localStorage.getItem(AUTH_KEY)
+    if (!raw) return null
+    // Migration: older versions stored "1"
+    if (raw === '1') {
+      const migrated: AuthState = { exp: Date.now() + AUTH_TTL_MS }
+      window.localStorage.setItem(AUTH_KEY, JSON.stringify(migrated))
+      return migrated
+    }
+    const parsed: unknown = JSON.parse(raw)
+    if (!parsed || typeof parsed !== 'object') return null
+    const exp = (parsed as Record<string, unknown>).exp
+    if (typeof exp !== 'number') return null
+    return { exp }
+  } catch {
+    return null
+  }
+}
+
+function clearAuth() {
+  try {
+    window.localStorage.removeItem(AUTH_KEY)
+  } catch {
+    // ignore
+  }
+}
 
 function AppInner() {
   const {
@@ -33,8 +69,26 @@ function AppInner() {
   } = useSchedulerState()
   const { t, lang, setLang } = useI18n()
   const { theme, toggleTheme } = useTheme()
+  const [auth, setAuth] = useState<AuthState | null>(() => readAuth())
+  const authed = !!auth && auth.exp > Date.now()
   const [activeTab, setActiveTab] = useState<'members' | 'schedules' | 'statistics' | 'review'>('members')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
+
+  // Auto-expire session
+  React.useEffect(() => {
+    if (!auth) return
+    const msLeft = auth.exp - Date.now()
+    if (msLeft <= 0) {
+      clearAuth()
+      setAuth(null)
+      return
+    }
+    const id = window.setTimeout(() => {
+      clearAuth()
+      setAuth(null)
+    }, msLeft)
+    return () => window.clearTimeout(id)
+  }, [auth])
 
   function eligibleForSlot(schedule: Schedule, slot: AssignmentSlot): Member[] {
     const weekend = isWeekend(schedule.date)
@@ -76,6 +130,22 @@ function AppInner() {
         return false
       })
       .sort((a, b) => mAssigned(a) - mAssigned(b) || a.name.localeCompare(b.name))
+  }
+
+  if (!authed) {
+    return (
+      <LoginPanel
+        onSuccess={() => {
+          const next: AuthState = { exp: Date.now() + AUTH_TTL_MS }
+          try {
+            window.localStorage.setItem(AUTH_KEY, JSON.stringify(next))
+          } catch {
+            // ignore
+          }
+          setAuth(next)
+        }}
+      />
+    )
   }
 
   return (
@@ -154,6 +224,15 @@ function AppInner() {
             </div>
             <Button variant="destructive" onClick={() => setShowResetConfirm(true)} className="gap-2">
               {t('actions.reset')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                clearAuth()
+                setAuth(null)
+              }}
+            >
+              {t('login.logout')}
             </Button>
           </div>
         </div>

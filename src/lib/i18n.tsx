@@ -102,6 +102,16 @@ const MESSAGES: Record<Lang, Messages> = {
     'autofill.allReachedTarget': 'All eligible members for "{instrument}" reached their target count.',
     'autofill.conflictPrevented': 'Conflict prevented assignment for "{instrument}".',
     'autofill.positionsUnfilled': '{count} position(s) unfilled.',
+
+    'login.title': 'Worship Scheduler',
+    'login.email': 'Email',
+    'login.password': 'Password',
+    'login.signIn': 'Sign in',
+    'login.invalid': 'Invalid credentials.',
+    'login.notConfigured': 'Login is not configured.',
+    'login.notConfiguredHelp':
+      'Set VITE_ADMIN_EMAIL and VITE_ADMIN_PASSWORD in a local .env.local file and restart the dev server.',
+    'login.logout': 'Log out',
   },
   'pt-BR': {
     'app.title': 'Worship Scheduler',
@@ -198,6 +208,16 @@ const MESSAGES: Record<Lang, Messages> = {
     'autofill.allReachedTarget': 'Todos os membros elegíveis para "{instrument}" atingiram sua quantidade desejada.',
     'autofill.conflictPrevented': 'Conflito impediu atribuição para "{instrument}".',
     'autofill.positionsUnfilled': '{count} posição(ões) não preenchida(s).',
+
+    'login.title': 'Worship Scheduler',
+    'login.email': 'Email',
+    'login.password': 'Senha',
+    'login.signIn': 'Entrar',
+    'login.invalid': 'Credenciais inválidas.',
+    'login.notConfigured': 'Login não configurado.',
+    'login.notConfiguredHelp':
+      'Defina VITE_ADMIN_EMAIL e VITE_ADMIN_PASSWORD em um arquivo .env.local e reinicie o servidor.',
+    'login.logout': 'Sair',
   },
 }
 
