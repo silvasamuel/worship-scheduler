@@ -175,6 +175,12 @@ export async function createLouveSchedule(payload: LouveSchedulePayload, bearerT
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
+    // Helpful hint when the production proxy route isn't deployed/configured
+    if (res.status === 404 && url.includes('/api/louve/')) {
+      throw new Error(
+        'Proxy endpoint not found (404). Ensure Vercel deployed the `api/louve/[...path].js` serverless function and that the project Root Directory is set to the repo folder that contains the `api/` directory, then redeploy.'
+      )
+    }
     try {
       type LouveErrorResponse = { error?: boolean; key?: string; message?: string }
       const data: unknown = JSON.parse(text)
