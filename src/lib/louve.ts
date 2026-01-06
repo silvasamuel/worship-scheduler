@@ -142,8 +142,7 @@ export function buildLouveSchedulePayload(
 }
 
 export async function createLouveSchedule(payload: LouveSchedulePayload, bearerToken: string): Promise<unknown> {
-  const apiBase =
-    import.meta.env.VITE_LOUVE_API_BASE || (import.meta.env.DEV ? '/louveapi' : 'https://api-v6.louveapp.com.br')
+  const apiBase = import.meta.env.VITE_LOUVE_API_BASE || (import.meta.env.DEV ? '/louveapi' : '/api/louve')
   const url = `${apiBase}/ministry/${payload.ministerio}/schedules`
   const token = normalizeBearerToken(bearerToken)
   const device = deviceHeaderFromJwt(token)
