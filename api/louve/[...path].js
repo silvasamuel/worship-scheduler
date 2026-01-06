@@ -1,13 +1,6 @@
 export default async function handler(req, res) {
   const base = 'https://api-v6.louveapp.com.br'
   const pathParts = Array.isArray(req.query?.path) ? req.query.path : [req.query?.path].filter(Boolean)
-  // Health check / deploy verification: GET /api/louve
-  if (!pathParts || pathParts.length === 0) {
-    res.statusCode = 200
-    res.setHeader('content-type', 'application/json')
-    res.end(JSON.stringify({ ok: true, proxy: 'louve', note: 'append /ministry/<id>/schedules' }))
-    return
-  }
   const qsIndex = req.url.indexOf('?')
   const qs = qsIndex >= 0 ? req.url.slice(qsIndex) : ''
   const targetUrl = `${base}/${pathParts.join('/')}${qs}`
