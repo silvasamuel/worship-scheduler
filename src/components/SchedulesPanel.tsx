@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Plus, CalendarPlus, Music, Trash2, Wand2, Info, X, CalendarDays, Pencil } from 'lucide-react'
+import { Plus, CalendarPlus, Music, Trash2, Wand2, Info, X, CalendarDays, Pencil, CheckCircle2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -51,7 +51,11 @@ export default function SchedulesPanel({
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null)
   const [addSlotValues, setAddSlotValues] = useState<Record<string, string>>({})
   const [monthOpen, setMonthOpen] = useState(false)
-  const [monthValue, setMonthValue] = useState('')
+  const [monthYear, setMonthYear] = useState(String(new Date().getFullYear()))
+  const [monthMonth, setMonthMonth] = useState('')
+  const [monthResultOpen, setMonthResultOpen] = useState(false)
+  const [monthResult, setMonthResult] = useState<{ created: number; skipped: number; ignored: number } | null>(null)
+  const [monthIgnore, setMonthIgnore] = useState<Array<'Freedom' | 'Somos Fortes' | 'Entre Elas'>>([])
   const [editOpen, setEditOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
@@ -125,21 +129,41 @@ export default function SchedulesPanel({
   }
 
   function generateMonthSchedules() {
-    if (!monthValue) return
-    const [yStr, mStr] = monthValue.split('-')
-    const year = Number(yStr)
-    const month = Number(mStr) // 1-12
+    const year = Number(monthYear)
+    const month = Number(monthMonth) // 1-12
     if (!year || !month) return
 
     const existing = new Set(schedules.map(s => `${s.date}|${s.time}`))
     let created = 0
     let skipped = 0
+    let ignored = 0
 
     const last = new Date(year, month, 0) // last day of month
     let firstThursdayDone = false
 
     const pad2 = (n: number) => String(n).padStart(2, '0')
     const toISODate = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+
+    const addIfMissing = (date: string, time: string, name: string, instruments: string[]) => {
+      const key = `${date}|${time}`
+      if (existing.has(key)) {
+        skipped++
+        return
+      }
+      onAddSchedule(date, time, name, instruments)
+      existing.add(key)
+      created++
+    }
+
+    const nthWeekdayOfMonth = (weekday: number, nth: number): Date | null => {
+      // weekday: 0=Sun..6=Sat
+      const first = new Date(year, month - 1, 1)
+      const firstDow = first.getDay()
+      const firstWanted = 1 + ((weekday - firstDow + 7) % 7)
+      const dayOfMonth = firstWanted + 7 * (nth - 1)
+      const d = new Date(year, month - 1, dayOfMonth)
+      return d.getMonth() === month - 1 ? d : null
+    }
 
     for (let day = 1; day <= last.getDate(); day++) {
       const d = new Date(year, month - 1, day)
@@ -166,9 +190,56 @@ export default function SchedulesPanel({
       if (dow === 4 && !firstThursdayDone) firstThursdayDone = true
     }
 
+    // Extra monthly events:
+    // - 1st Saturday: Freedom @ 18:30
+    const firstSaturday = nthWeekdayOfMonth(6, 1)
+    if (monthIgnore.includes('Freedom')) {
+      ignored++
+    } else if (firstSaturday)
+      addIfMissing(
+        toISODate(firstSaturday),
+        '18:30',
+        'Freedom',
+        INSTRUMENTS.filter(i => !['Teclado'].includes(i))
+      )
+
+    // - 2nd Friday: Somos Fortes @ 19:30
+    const secondFriday = nthWeekdayOfMonth(5, 2)
+    if (monthIgnore.includes('Somos Fortes')) {
+      ignored++
+    } else if (secondFriday)
+      addIfMissing(
+        toISODate(secondFriday),
+        '19:30',
+        'Somos Fortes',
+        INSTRUMENTS.filter(i => !['Guitarra', 'Teclado', 'Baixo', 'Backing'].includes(i))
+      )
+
+    // - 2nd Saturday: Entre Elas @ 16:30
+    const secondSaturday = nthWeekdayOfMonth(6, 2)
+    if (monthIgnore.includes('Entre Elas')) {
+      ignored++
+    } else if (secondSaturday)
+      addIfMissing(
+        toISODate(secondSaturday),
+        '16:30',
+        'Entre Elas',
+        INSTRUMENTS.filter(i => !['Guitarra', 'Teclado', 'Baixo', 'Bateria', 'Backing'].includes(i))
+      )
+
+    // - 3rd Saturday: Ensaio @ 16:45 and @ 18:30
+    const thirdSaturday = nthWeekdayOfMonth(6, 3)
+    if (thirdSaturday) {
+      const date = toISODate(thirdSaturday)
+      addIfMissing(date, '16:45', 'Ensaio', [...INSTRUMENTS])
+      addIfMissing(date, '18:30', 'Ensaio', [...INSTRUMENTS])
+    }
+
     setMonthOpen(false)
-    setMonthValue('')
-    alert(`${created} created, ${skipped} skipped (already existed).`)
+    setMonthYear('')
+    setMonthMonth('')
+    setMonthResult({ created, skipped, ignored })
+    setMonthResultOpen(true)
   }
 
   function openEdit(s: Schedule) {
@@ -418,21 +489,121 @@ export default function SchedulesPanel({
         <Modal open={monthOpen} onOpenChange={setMonthOpen} title={t('schedules.generateMonth')}>
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs text-gray-600 dark:text-gray-400">{t('schedules.month')}</label>
-              <input
-                type="month"
-                value={monthValue}
-                onChange={e => setMonthValue(e.target.value)}
-                className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <Select value={monthYear} onValueChange={setMonthYear}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t('schedules.year')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 7 }).map((_, idx) => {
+                      const y = String(new Date().getFullYear() + idx)
+                      return (
+                        <SelectItem key={y} value={y}>
+                          {y}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <Select value={monthMonth} onValueChange={setMonthMonth}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t('schedules.month')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }).map((_, idx) => {
+                      const m = String(idx + 1).padStart(2, '0')
+                      const label = new Intl.DateTimeFormat(locale, { month: 'long' }).format(new Date(2020, idx, 1))
+                      return (
+                        <SelectItem key={m} value={m}>
+                          {label}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-xs text-gray-600 dark:text-gray-400">{t('schedules.generateIgnoreLabel')}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {(['Freedom', 'Somos Fortes', 'Entre Elas'] as const).map(name => {
+                  const checked = monthIgnore.includes(name)
+                  return (
+                    <label
+                      key={name}
+                      className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm cursor-pointer transition-all duration-200 ${
+                        checked
+                          ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-gray-900 dark:border-gray-100'
+                          : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="accent-blue-600"
+                        checked={checked}
+                        onChange={e => {
+                          const next = e.target.checked
+                          setMonthIgnore(prev => (next ? [...prev, name] : prev.filter(x => x !== name)))
+                        }}
+                      />
+                      <span className="font-medium">{name}</span>
+                    </label>
+                  )
+                })}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{t('schedules.generateIgnoreHelp')}</div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setMonthOpen(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setMonthOpen(false)
+                  setMonthYear('')
+                  setMonthMonth('')
+                }}
+              >
                 {t('actions.cancel')}
               </Button>
-              <Button onClick={generateMonthSchedules} disabled={!monthValue}>
+              <Button onClick={generateMonthSchedules} disabled={!monthYear || !monthMonth}>
                 {t('schedules.generate')}
               </Button>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          open={monthResultOpen}
+          onOpenChange={o => {
+            setMonthResultOpen(o)
+            if (!o) setMonthResult(null)
+          }}
+          title={t('schedules.generateResultTitle')}
+          className="max-w-md"
+        >
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 rounded-2xl border border-gray-200/70 dark:border-gray-700/70 bg-gradient-to-br from-white to-gray-50/60 dark:from-gray-800 dark:to-gray-900/60 p-4 shadow-sm">
+              <div className="mt-0.5 text-green-600 dark:text-green-400">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {t('schedules.generateResultSubtitle')}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Badge className="bg-green-600">
+                    {t('schedules.generateResultCreated', { count: monthResult?.created ?? 0 })}
+                  </Badge>
+                  <Badge className="bg-gray-500">
+                    {t('schedules.generateResultSkipped', { count: monthResult?.skipped ?? 0 })}
+                  </Badge>
+                  <Badge className="bg-blue-600">
+                    {t('schedules.generateResultIgnored', { count: monthResult?.ignored ?? 0 })}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={() => setMonthResultOpen(false)}>{t('actions.close')}</Button>
             </div>
           </div>
         </Modal>
