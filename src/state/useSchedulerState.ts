@@ -79,6 +79,19 @@ export function useSchedulerState() {
     setSchedules(prev => prev.filter(s => s.id !== id))
   }
 
+  function updateScheduleMeta(scheduleId: string, patch: { name?: string; date?: string; time?: string }) {
+    setSchedules(prev => {
+      const updated = prev.map(s => {
+        if (s.id !== scheduleId) return s
+        const nextName = typeof patch.name === 'string' ? patch.name.trim() : s.name
+        const nextDate = typeof patch.date === 'string' ? patch.date : s.date
+        const nextTime = typeof patch.time === 'string' ? patch.time.trim() : s.time
+        return { ...s, name: nextName, date: nextDate, time: nextTime }
+      })
+      return updated.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
+    })
+  }
+
   function setAssignmentMember(scheduleId: string, slotId: string, memberId?: string) {
     setSchedules(prev =>
       prev.map(s => {
@@ -337,6 +350,7 @@ export function useSchedulerState() {
     updateMember,
     addSchedule,
     removeSchedule,
+    updateScheduleMeta,
     setAssignmentMember,
     addSlotToSchedule,
     removeSlotFromSchedule,

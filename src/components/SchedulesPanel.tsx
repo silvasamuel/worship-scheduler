@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Plus, CalendarPlus, Music, Trash2, Wand2, Info, X, CalendarDays } from 'lucide-react'
+import { Plus, CalendarPlus, Music, Trash2, Wand2, Info, X, CalendarDays, Pencil } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -10,12 +10,14 @@ import { dayLabel } from '@/lib/date'
 import { useI18n } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Modal } from '@/components/ui/modal'
+import { Input } from '@/components/ui/input'
 
 type Props = {
   schedules: Schedule[]
   members: Member[]
   onAddSchedule: (date: string, time: string, name: string, req: string[]) => void
   onRemoveSchedule: (id: string) => void
+  onUpdateSchedule: (id: string, patch: { name?: string; date?: string; time?: string }) => void
   onSetAssign: (scheduleId: string, slotId: string, memberId?: string) => void
   onAddSlot: (scheduleId: string, instrument: string) => void
   onRemoveSlot: (scheduleId: string, slotId: string) => void
@@ -31,6 +33,7 @@ export default function SchedulesPanel({
   members,
   onAddSchedule,
   onRemoveSchedule,
+  onUpdateSchedule,
   onSetAssign,
   onAddSlot,
   onRemoveSlot,
@@ -49,6 +52,11 @@ export default function SchedulesPanel({
   const [addSlotValues, setAddSlotValues] = useState<Record<string, string>>({})
   const [monthOpen, setMonthOpen] = useState(false)
   const [monthValue, setMonthValue] = useState('')
+  const [editOpen, setEditOpen] = useState(false)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editDate, setEditDate] = useState('') // yyyy-mm-dd
+  const [editTime, setEditTime] = useState('') // HH:mm
 
   const AUTO_SUNDAY_NAME = 'DOMINGO DE CELEBRAÇÃO'
   const AUTO_FIRST_THURSDAY_NAME = 'FAROL DE ORAÇÃO'
@@ -161,6 +169,24 @@ export default function SchedulesPanel({
     setMonthOpen(false)
     setMonthValue('')
     alert(`${created} created, ${skipped} skipped (already existed).`)
+  }
+
+  function openEdit(s: Schedule) {
+    setEditId(s.id)
+    setEditName(s.name || '')
+    setEditDate(s.date || '')
+    setEditTime(s.time || '')
+    setEditOpen(true)
+  }
+
+  function saveEdit() {
+    if (!editId) return
+    const name = editName.trim()
+    const date = editDate
+    const time = editTime.trim()
+    if (!name || !date || !time) return
+    onUpdateSchedule(editId, { name, date, time })
+    setEditOpen(false)
   }
 
   return (
@@ -278,6 +304,9 @@ export default function SchedulesPanel({
                   {t(`status.${s.status}`)}
                 </Badge>
                 <div className="ml-auto flex items-center gap-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(s)} title={t('schedules.edit')}>
+                    <Pencil className="w-4 h-4" />
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => setConfirmRemoveId(s.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -403,6 +432,43 @@ export default function SchedulesPanel({
               </Button>
               <Button onClick={generateMonthSchedules} disabled={!monthValue}>
                 {t('schedules.generate')}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          open={editOpen}
+          onOpenChange={o => {
+            setEditOpen(o)
+            if (!o) {
+              setEditId(null)
+              setEditName('')
+              setEditDate('')
+              setEditTime('')
+            }
+          }}
+          title={t('schedules.editTitle')}
+        >
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs text-gray-600 dark:text-gray-400">{t('schedules.editName')}</label>
+              <Input value={editName} onChange={e => setEditName(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-gray-600 dark:text-gray-400">{t('schedules.editDate')}</label>
+              <Input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} lang={locale} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-gray-600 dark:text-gray-400">{t('schedules.editTime')}</label>
+              <Input type="time" value={editTime} onChange={e => setEditTime(e.target.value)} />
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="secondary" onClick={() => setEditOpen(false)}>
+                {t('actions.cancel')}
+              </Button>
+              <Button onClick={saveEdit} disabled={!editId || !editName.trim() || !editDate || !editTime.trim()}>
+                {t('actions.save')}
               </Button>
             </div>
           </div>

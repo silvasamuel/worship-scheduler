@@ -59,6 +59,7 @@ function AppInner() {
     updateMember,
     addSchedule,
     removeSchedule,
+    updateScheduleMeta,
     setAssignmentMember,
     addSlotToSchedule,
     removeSlotFromSchedule,
@@ -299,6 +300,7 @@ function AppInner() {
             members={members}
             onAddSchedule={addSchedule}
             onRemoveSchedule={removeSchedule}
+            onUpdateSchedule={updateScheduleMeta}
             onSetAssign={setAssignmentMember}
             onAddSlot={addSlotToSchedule}
             onRemoveSlot={removeSlotFromSchedule}
