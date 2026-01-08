@@ -172,10 +172,26 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                 onChange={e => setMTargetCount(e.target.value === '' ? '' : parseInt(e.target.value || '0', 10))}
               />
             </div>
-            <label className="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 mt-6">
-              <input type="checkbox" checked={mCanSingAndPlay} onChange={e => setMCanSingAndPlay(e.target.checked)} />
-              {t('members.allowSingPlay')}
-            </label>
+            <div className="mt-6 inline-flex items-center gap-3 text-xs text-gray-700 dark:text-gray-300 select-none">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={mCanSingAndPlay}
+                onClick={() => setMCanSingAndPlay(v => !v)}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full border transition-colors ${
+                  mCanSingAndPlay
+                    ? 'bg-gray-900 border-gray-900 dark:bg-gray-100 dark:border-gray-100'
+                    : 'bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600/70'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 rounded-full shadow-sm transition-transform ${
+                    mCanSingAndPlay ? 'bg-white dark:bg-gray-900' : 'bg-gray-900 dark:bg-white'
+                  } ${mCanSingAndPlay ? 'translate-x-4' : 'translate-x-0.5'}`}
+                />
+              </button>
+              <span className="leading-tight">{t('members.allowSingPlay')}</span>
+            </div>
           </div>
         </div>
 
@@ -308,10 +324,26 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                   onChange={e => setETarget(parseInt(e.target.value || '0', 10))}
                 />
               </div>
-              <label className="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-                <input type="checkbox" checked={eCanSingAndPlay} onChange={e => setECanSingAndPlay(e.target.checked)} />
-                {t('members.allowSingPlay')}
-              </label>
+              <div className="inline-flex items-center gap-3 text-xs text-gray-700 dark:text-gray-300 select-none">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={eCanSingAndPlay}
+                  onClick={() => setECanSingAndPlay(v => !v)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full border transition-colors ${
+                    eCanSingAndPlay
+                      ? 'bg-gray-900 border-gray-900 dark:bg-gray-100 dark:border-gray-100'
+                      : 'bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600/70'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 rounded-full shadow-sm transition-transform ${
+                      eCanSingAndPlay ? 'bg-white dark:bg-gray-900' : 'bg-gray-900 dark:bg-white'
+                    } ${eCanSingAndPlay ? 'translate-x-4' : 'translate-x-0.5'}`}
+                  />
+                </button>
+                <span className="leading-tight">{t('members.allowSingPlay')}</span>
+              </div>
               <div className="flex justify-end gap-2 pt-1">
                 <Button variant="secondary" onClick={() => setEditing(null)}>
                   {t('actions.cancel')}

@@ -20,4 +20,10 @@ body,
   .dark {
     color-scheme: dark;
   }
+
+  /* Make native time picker indicator visible in dark mode (Chrome/Safari/WebKit) */
+  .dark input[type='time']::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.9;
+  }
 }

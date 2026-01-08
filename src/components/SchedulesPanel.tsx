@@ -1,5 +1,17 @@
 import React, { useState, useRef } from 'react'
-import { Plus, CalendarPlus, Music, Trash2, Wand2, Info, X, CalendarDays, Pencil, CheckCircle2 } from 'lucide-react'
+import {
+  Plus,
+  CalendarPlus,
+  Music,
+  Trash2,
+  Wand2,
+  Info,
+  X,
+  CalendarDays,
+  Pencil,
+  CheckCircle2,
+  Clock,
+} from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -41,10 +53,15 @@ export default function SchedulesPanel({
   eligibleForSlot,
 }: Props) {
   const { t, locale, instrumentLabel } = useI18n()
-  const [sDateTime, setSDateTime] = useState('')
+  const [sDate, setSDate] = useState('') // yyyy-mm-dd
+  const [sTime, setSTime] = useState('') // HH:mm
+  const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const now = new Date()
+  const [pickerYear, setPickerYear] = useState(String(now.getFullYear()))
+  const [pickerMonth, setPickerMonth] = useState(String(now.getMonth() + 1).padStart(2, '0')) // "01".."12"
   const [sName, setSName] = useState('')
   const [sInstruments, setSInstruments] = useState<string[]>([])
-  const canAddSchedule = Boolean(sDateTime) && Boolean(sName.trim()) && sInstruments.length > 0
+  const canAddSchedule = Boolean(sDate) && Boolean(sTime) && Boolean(sName.trim()) && sInstruments.length > 0
   const [showAddScheduleTip, setShowAddScheduleTip] = useState(false)
   const [scheduleTipPlacement, setScheduleTipPlacement] = useState<'top' | 'bottom'>('top')
   const addScheduleWrapperRef = useRef<HTMLSpanElement | null>(null)
@@ -91,25 +108,31 @@ export default function SchedulesPanel({
 
   function addSchedule() {
     if (!canAddSchedule) return
-    const [date, time] = sDateTime.split('T')
-    onAddSchedule(date, time || '19:30', sName, sInstruments)
-    setSDateTime('')
+    onAddSchedule(sDate, sTime, sName, sInstruments)
+    setSDate('')
+    setSTime('')
     setSName('')
     setSInstruments([])
   }
 
-  function openDatePicker(e: React.MouseEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>) {
-    const input = e.currentTarget
-    const showPicker = (input as HTMLInputElement).showPicker
-    if (typeof showPicker === 'function') {
-      try {
-        showPicker.call(input)
-      } catch {
-        // no-op
-      }
-    } else {
-      input.focus()
-    }
+  function defaultTimeForDate(dateISO: string): string {
+    const d = new Date(dateISO + 'T00:00:00')
+    const dow = d.getDay()
+    if (dow === 0) return '09:00' // Sunday
+    if (dow === 4) return '19:30' // Thursday
+    return '19:30'
+  }
+
+  function toISODateStr(d: Date): string {
+    const pad2 = (n: number) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+  }
+
+  function openAddDatePicker() {
+    const base = sDate ? new Date(sDate + 'T00:00:00') : new Date()
+    setPickerYear(String(base.getFullYear()))
+    setPickerMonth(String(base.getMonth() + 1).padStart(2, '0'))
+    setDatePickerOpen(true)
   }
 
   function maybeShowScheduleTooltip(e: React.MouseEvent) {
@@ -269,21 +292,30 @@ export default function SchedulesPanel({
         </div>
 
         <div className="flex flex-wrap items-start gap-2 mb-3">
-          <div className="w-60">
-            <input
-              type="datetime-local"
-              value={sDateTime}
-              onChange={e => {
-                const next = e.target.value
-                setSDateTime(next)
-                const [date] = next.split('T')
-                maybeAutofillNameFromDate(date)
-              }}
-              onFocus={openDatePicker}
-              onClick={openDatePicker}
-              lang={locale}
-              className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
-            />
+          <button
+            type="button"
+            onClick={openAddDatePicker}
+            className="w-60 flex items-center gap-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600"
+            title={t('schedules.pickDate')}
+          >
+            <CalendarDays className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+            <span className={sDate ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}>
+              {sDate ? dayLabel(sDate, locale) : t('schedules.pickDate')}
+            </span>
+          </button>
+          <div className="w-36">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-100">
+                <Clock className="w-4 h-4" />
+              </span>
+              <Input
+                type="time"
+                value={sTime}
+                onChange={e => setSTime(e.target.value)}
+                className="pl-10"
+                aria-label={t('schedules.time')}
+              />
+            </div>
           </div>
           <input
             type="text"
@@ -319,6 +351,130 @@ export default function SchedulesPanel({
             {t('schedules.generateMonth')}
           </Button>
         </div>
+
+        <Modal open={datePickerOpen} onOpenChange={setDatePickerOpen} title={t('schedules.pickDateTitle')}>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <Select value={pickerYear} onValueChange={setPickerYear}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t('schedules.year')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 9 }).map((_, idx) => {
+                    const y = String(new Date().getFullYear() - 2 + idx)
+                    return (
+                      <SelectItem key={y} value={y}>
+                        {y}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+              <Select value={pickerMonth} onValueChange={setPickerMonth}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t('schedules.month')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 12 }).map((_, idx) => {
+                    const m = String(idx + 1).padStart(2, '0')
+                    const label = new Intl.DateTimeFormat(locale, { month: 'long' }).format(new Date(2020, idx, 1))
+                    return (
+                      <SelectItem key={m} value={m}>
+                        {label}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {(() => {
+              const y = Number(pickerYear)
+              const mIdx = Number(pickerMonth) - 1
+              const first = new Date(y, mIdx, 1)
+              const lastDay = new Date(y, mIdx + 1, 0).getDate()
+              const offset = (first.getDay() + 6) % 7 // Monday-first
+              const todayISO = toISODateStr(new Date())
+              const selected = sDate
+              const weekdayBase = new Date(2023, 0, 2) // Monday
+              const weekdays = Array.from({ length: 7 }).map((_, i) =>
+                new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(
+                  new Date(weekdayBase.getFullYear(), weekdayBase.getMonth(), weekdayBase.getDate() + i)
+                )
+              )
+
+              return (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-7 gap-1 text-[11px] text-gray-500 dark:text-gray-400">
+                    {weekdays.map(w => (
+                      <div key={w} className="text-center uppercase tracking-wide">
+                        {w}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: offset }).map((_, i) => (
+                      <div key={`sp-${i}`} />
+                    ))}
+                    {Array.from({ length: lastDay }).map((_, i) => {
+                      const day = i + 1
+                      const iso = toISODateStr(new Date(y, mIdx, day))
+                      const isSelected = selected === iso
+                      const isToday = todayISO === iso
+                      return (
+                        <button
+                          key={iso}
+                          type="button"
+                          onClick={() => {
+                            setSDate(iso)
+                            maybeAutofillNameFromDate(iso)
+                            setSTime(prev => (prev && prev.trim() ? prev : defaultTimeForDate(iso)))
+                            setDatePickerOpen(false)
+                          }}
+                          className={`h-9 rounded-xl border text-sm transition-all duration-150 ${
+                            isSelected
+                              ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-gray-900 dark:border-gray-100 shadow-sm'
+                              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          } ${isToday && !isSelected ? 'ring-2 ring-blue-500/40' : ''}`}
+                        >
+                          {day}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })()}
+
+            <div className="flex justify-between gap-2 pt-1">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  const iso = toISODateStr(new Date())
+                  setSDate(iso)
+                  maybeAutofillNameFromDate(iso)
+                  setSTime(prev => (prev && prev.trim() ? prev : defaultTimeForDate(iso)))
+                  setDatePickerOpen(false)
+                }}
+              >
+                {t('schedules.today')}
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setSDate('')
+                    setSTime('')
+                    setDatePickerOpen(false)
+                  }}
+                >
+                  {t('schedules.clear')}
+                </Button>
+                <Button onClick={() => setDatePickerOpen(false)}>{t('actions.close')}</Button>
+              </div>
+            </div>
+          </div>
+        </Modal>
 
         <div className="space-y-2 mb-3">
           <div className="flex justify-end">
