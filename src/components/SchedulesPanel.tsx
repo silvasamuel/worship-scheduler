@@ -58,7 +58,7 @@ export default function SchedulesPanel({
   const [datePickerOpen, setDatePickerOpen] = useState(false)
   const now = new Date()
   const [pickerYear, setPickerYear] = useState(String(now.getFullYear()))
-  const [pickerMonth, setPickerMonth] = useState(String(now.getMonth() + 1).padStart(2, '0')) // "01".."12"
+  const [pickerMonth, setPickerMonth] = useState('')
   const [sName, setSName] = useState('')
   const [sInstruments, setSInstruments] = useState<string[]>([])
   const canAddSchedule = Boolean(sDate) && Boolean(sTime) && Boolean(sName.trim()) && sInstruments.length > 0
@@ -370,7 +370,17 @@ export default function SchedulesPanel({
                   })}
                 </SelectContent>
               </Select>
-              <Select value={pickerMonth} onValueChange={setPickerMonth}>
+              <Select
+                value={pickerMonth}
+                onValueChange={setPickerMonth}
+                valueLabel={
+                  pickerMonth
+                    ? new Intl.DateTimeFormat(locale, { month: 'long' }).format(
+                        new Date(2020, Number(pickerMonth) - 1, 1)
+                      )
+                    : undefined
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t('schedules.month')} />
                 </SelectTrigger>

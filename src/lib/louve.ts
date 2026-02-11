@@ -39,6 +39,10 @@ function normalizeBearerToken(input: string): string {
   return cleaned.replace(/^bearer\s+/i, '').trim()
 }
 
+export function normalizeLouveBearerToken(input: string): string {
+  return normalizeBearerToken(input)
+}
+
 function base64UrlDecode(input: string): string {
   const base64 = input.replace(/-/g, '+').replace(/_/g, '/')
   const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
@@ -96,7 +100,7 @@ export function buildLouveSchedulePayload(
   const grouped = new Map<string, Set<string>>() // memberId -> functionIds
 
   schedule.assignments.forEach(a => {
-    if (!a.memberId) throw new Error(`Schedule "${schedule.name}" has unassigned slots.`)
+    if (!a.memberId) return
     const m = byId.get(a.memberId)
     if (!m) throw new Error(`Assigned member "${a.memberId}" not found in members list.`)
     const louveUserId = m.louveUserId
