@@ -29,6 +29,8 @@ const MESSAGES: Record<Lang, Messages> = {
     'members.tooltip.add': 'Enter a name and select at least one instrument',
     'members.empty': 'No members yet. Add some above.',
     'members.assigned': 'Assigned',
+    'members.active': 'Active',
+    'members.inactive': 'Inactive',
 
     'availability.both': 'Weekdays & Weekends',
     'availability.weekdays': 'Weekdays only',
@@ -158,6 +160,8 @@ const MESSAGES: Record<Lang, Messages> = {
     'members.tooltip.add': 'Informe um nome e selecione pelo menos um instrumento',
     'members.empty': 'Nenhum membro ainda. Adicione acima.',
     'members.assigned': 'Atribuído',
+    'members.active': 'Ativo',
+    'members.inactive': 'Inativo',
 
     'availability.both': 'Dias de semana e finais de semana',
     'availability.weekdays': 'Somente dias de semana',

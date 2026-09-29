@@ -192,6 +192,7 @@ export function useSchedulerState() {
       const takenVocalists = vocalistByWeek.get(wk) || new Set<string>()
 
       return members
+        .filter(m => !m.inactive)
         .filter(m => m.instruments.map(norm).includes(norm(instrument)))
         .filter(m => canServeDate(m, dateISO))
         .filter(m => counts[m.id] < m.targetCount)
@@ -204,7 +205,7 @@ export function useSchedulerState() {
       const vocalistSlot = scheduleAssignments.find(a => norm(a.instrument) === VOCALISTA && a.memberId)
       if (!vocalistSlot?.memberId) return
       const m = members.find(mm => mm.id === vocalistSlot.memberId)
-      if (!m) return
+      if (!m || m.inactive) return
       const playsAcousticGuitar = m.instruments.map(norm).includes(ACOUSTIC_GUITAR)
       if (!playsAcousticGuitar) return
 
@@ -251,14 +252,17 @@ export function useSchedulerState() {
       const issues: string[] = []
       missing.forEach(m => {
         const instLabel = instrumentLabel ? instrumentLabel(m.instrument) : m.instrument
-        const noInstrument = members.filter(mem => mem.instruments.map(norm).includes(norm(m.instrument))).length === 0
+        const activeMembers = members.filter(mem => !mem.inactive)
+        const noInstrument =
+          activeMembers.filter(mem => mem.instruments.map(norm).includes(norm(m.instrument))).length === 0
         if (noInstrument) {
           issues.push(t ? t('autofill.noMemberPlays', { instrument: instLabel }) : `No member plays "${instLabel}".`)
           return
         }
         const availMatch =
-          members.filter(mem => mem.instruments.map(norm).includes(norm(m.instrument)) && canServeDate(mem, s.date))
-            .length > 0
+          activeMembers.filter(
+            mem => mem.instruments.map(norm).includes(norm(m.instrument)) && canServeDate(mem, s.date)
+          ).length > 0
         if (!availMatch) {
           issues.push(
             t
@@ -268,7 +272,7 @@ export function useSchedulerState() {
           return
         }
         const remainingCap =
-          members.filter(
+          activeMembers.filter(
             mem =>
               mem.instruments.map(norm).includes(norm(m.instrument)) &&
               canServeDate(mem, s.date) &&

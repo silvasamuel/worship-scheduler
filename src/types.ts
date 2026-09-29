@@ -8,6 +8,8 @@ export interface Member {
   targetCount: number
   assignedCount: number
   canSingAndPlay?: boolean
+  /** When true, the member is hidden from assignment dropdowns and skipped by auto-fill. */
+  inactive?: boolean
   /**
    * Optional Louveapp integration fields.
    * - louveUserId: Louve user _id

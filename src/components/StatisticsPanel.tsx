@@ -9,8 +9,15 @@ type Props = {
   schedules: Schedule[]
 }
 
+function formatAssignmentWhen(dateISO: string, locale: string) {
+  const d = new Date(dateISO + 'T00:00:00')
+  const date = new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(d)
+  return { date, weekday }
+}
+
 export default function StatisticsPanel({ members, schedules }: Props) {
-  const { t, instrumentLabel } = useI18n()
+  const { t, locale, instrumentLabel } = useI18n()
   const [expandedMembers, setExpandedMembers] = useState<Set<string>>(new Set())
 
   const toggleMember = (memberId: string) => {
@@ -26,25 +33,32 @@ export default function StatisticsPanel({ members, schedules }: Props) {
   }
 
   const memberStats = useMemo(() => {
-    const stats: Array<{ member: Member; count: number; instrumentCounts: Record<string, number> }> = []
+    const stats: Array<{
+      member: Member
+      count: number
+      assignments: Array<{ key: string; instrument: string; date: string }>
+    }> = []
 
     members.forEach(member => {
-      // Count unique schedules where the member is assigned (regardless of number of roles)
       const assignedSchedules = new Set<string>()
-      const instrumentCounts: Record<string, number> = {}
+      const assignments: Array<{ key: string; instrument: string; date: string }> = []
 
       schedules.forEach(schedule => {
         const memberAssignments = schedule.assignments.filter(assignment => assignment.memberId === member.id)
         if (memberAssignments.length > 0) {
           assignedSchedules.add(schedule.id)
-          // Count assignments per instrument
           memberAssignments.forEach(assignment => {
-            const inst = assignment.instrument
-            instrumentCounts[inst] = (instrumentCounts[inst] || 0) + 1
+            assignments.push({
+              key: `${schedule.id}-${assignment.id}`,
+              instrument: assignment.instrument,
+              date: schedule.date,
+            })
           })
         }
       })
-      stats.push({ member, count: assignedSchedules.size, instrumentCounts })
+
+      assignments.sort((a, b) => a.date.localeCompare(b.date) || a.instrument.localeCompare(b.instrument))
+      stats.push({ member, count: assignedSchedules.size, assignments })
     })
 
     return stats.sort((a, b) => b.count - a.count)
@@ -72,7 +86,6 @@ export default function StatisticsPanel({ members, schedules }: Props) {
               {memberStats.map(stat => {
                 const width = maxCount > 0 ? (stat.count / maxCount) * barMaxWidth : 0
                 const isExpanded = expandedMembers.has(stat.member.id)
-                const instrumentEntries = Object.entries(stat.instrumentCounts).sort((a, b) => b[1] - a[1])
 
                 return (
                   <div key={stat.member.id} className="space-y-2">
@@ -106,19 +119,24 @@ export default function StatisticsPanel({ members, schedules }: Props) {
                         </div>
                       </div>
                     </div>
-                    {isExpanded && instrumentEntries.length > 0 && (
+                    {isExpanded && stat.assignments.length > 0 && (
                       <div className="ml-7 pl-4 border-l-2 border-gray-200 dark:border-gray-700 space-y-2">
-                        {instrumentEntries.map(([instrument, count]) => (
-                          <div
-                            key={instrument}
-                            className="flex items-center justify-between text-sm py-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800/50"
-                          >
-                            <span className="text-gray-700 dark:text-gray-300">{instrumentLabel(instrument)}</span>
-                            <span className="text-gray-600 dark:text-gray-400 font-medium">
-                              {count} {count === 1 ? t('statistics.schedule') : t('statistics.schedules')}
-                            </span>
-                          </div>
-                        ))}
+                        {stat.assignments.map(assignment => {
+                          const when = formatAssignmentWhen(assignment.date, locale)
+                          return (
+                            <div
+                              key={assignment.key}
+                              className="flex items-center justify-between gap-3 text-sm py-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                            >
+                              <span className="text-gray-700 dark:text-gray-300">
+                                {instrumentLabel(assignment.instrument)}
+                              </span>
+                              <span className="text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap">
+                                {when.date} · {when.weekday}
+                              </span>
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
                   </div>

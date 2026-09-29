@@ -118,7 +118,8 @@ export const DEFAULT_MEMBERS: Member[] = [
       { id: '5f31e5e47803d600172af726', nome: 'Baixo' },
       { id: '64eeab19479eee0008490f98', nome: 'Backing' },
     ],
-    'weekends'
+    'weekends',
+    true
   ),
   louveMember(
     '64ee5d025c3a580008630586',

@@ -51,6 +51,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
   const [eAvailability, setEAvailability] = useState<Availability>('both')
   const [eTarget, setETarget] = useState<number>(6)
   const [eCanSingAndPlay, setECanSingAndPlay] = useState(false)
+  const [eInactive, setEInactive] = useState(false)
   const [confirmRemove, setConfirmRemove] = useState<Member | null>(null)
 
   function addMember() {
@@ -92,6 +93,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
     setEAvailability(m.availability)
     setETarget(m.targetCount)
     setECanSingAndPlay(!!m.canSingAndPlay)
+    setEInactive(!!m.inactive)
   }
 
   function saveEdit() {
@@ -108,6 +110,7 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
       availability: eAvailability,
       targetCount: Math.max(0, eTarget | 0),
       canSingAndPlay: eCanSingAndPlay,
+      inactive: eInactive,
     })
     setEditing(null)
   }
@@ -223,7 +226,9 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
           {members.map(m => (
             <div
               key={m.id}
-              className="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-2xl p-4 border border-gray-200/60 dark:border-gray-700/60"
+              className={`flex items-center gap-3 rounded-2xl p-4 border border-gray-200/60 dark:border-gray-700/60 ${
+                m.inactive ? 'bg-gray-50 dark:bg-gray-900/40 opacity-70' : 'bg-gray-100 dark:bg-gray-800'
+              }`}
             >
               <div className="flex-1">
                 <div className="font-medium">{m.name}</div>
@@ -244,7 +249,33 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                   <span>
                     {t('members.assigned')}: {mAssigned(m)}
                   </span>
+                  {m.inactive && (
+                    <Badge variant="outline" className="rounded-full">
+                      {t('members.inactive')}
+                    </Badge>
+                  )}
                 </div>
+              </div>
+              <div className="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 select-none">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={!m.inactive}
+                  aria-label={m.inactive ? t('members.inactive') : t('members.active')}
+                  onClick={() => onUpdate({ ...m, inactive: !m.inactive })}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full border transition-colors ${
+                    !m.inactive
+                      ? 'bg-gray-900 border-gray-900 dark:bg-gray-100 dark:border-gray-100'
+                      : 'bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600/70'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 rounded-full shadow-sm transition-transform ${
+                      !m.inactive ? 'bg-white dark:bg-gray-900' : 'bg-gray-900 dark:bg-white'
+                    } ${!m.inactive ? 'translate-x-4' : 'translate-x-0.5'}`}
+                  />
+                </button>
+                <span className="leading-tight w-12">{m.inactive ? t('members.inactive') : t('members.active')}</span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setConfirmRemove(m)}>
                 <Trash2 className="w-4 h-4" />
@@ -343,6 +374,26 @@ export default function MembersPanel({ members, onAdd, onRemove, onUpdate, mAssi
                   />
                 </button>
                 <span className="leading-tight">{t('members.allowSingPlay')}</span>
+              </div>
+              <div className="inline-flex items-center gap-3 text-xs text-gray-700 dark:text-gray-300 select-none">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={!eInactive}
+                  onClick={() => setEInactive(v => !v)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full border transition-colors ${
+                    !eInactive
+                      ? 'bg-gray-900 border-gray-900 dark:bg-gray-100 dark:border-gray-100'
+                      : 'bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600/70'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 rounded-full shadow-sm transition-transform ${
+                      !eInactive ? 'bg-white dark:bg-gray-900' : 'bg-gray-900 dark:bg-white'
+                    } ${!eInactive ? 'translate-x-4' : 'translate-x-0.5'}`}
+                  />
+                </button>
+                <span className="leading-tight">{eInactive ? t('members.inactive') : t('members.active')}</span>
               </div>
               <div className="flex justify-end gap-2 pt-1">
                 <Button variant="secondary" onClick={() => setEditing(null)}>

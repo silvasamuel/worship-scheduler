@@ -108,6 +108,7 @@ function AppInner() {
     const taken = new Set(assignedInSchedule.map(a => a.memberId))
 
     return members
+      .filter(m => !m.inactive)
       .filter(m => m.instruments.map(norm).includes(norm(slot.instrument)))
       .filter(m => (m.availability === 'both' ? true : m.availability === 'weekends' ? weekend : !weekend))
       .filter(m => {
