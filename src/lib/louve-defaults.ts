@@ -118,7 +118,7 @@ export const DEFAULT_MEMBERS: Member[] = [
       { id: '5f31e5e47803d600172af726', nome: 'Baixo' },
       { id: '64eeab19479eee0008490f98', nome: 'Backing' },
     ],
-    'weekends',
+    'weekdays',
     true
   ),
   louveMember(
@@ -134,6 +134,7 @@ export const DEFAULT_MEMBERS: Member[] = [
     'both',
     true
   ),
+  louveMember('6aede5e7a8f1515f2f176a45', 'Ketlen Correia', [{ id: '64ed5ae519c9940008c3159a', nome: 'Mídia' }]),
   louveMember('6a3c3dc17309f2dfa9483096', 'Lenice Costa', [
     { id: '5f31e1d17803d600172af717', nome: 'Vocalista' },
     { id: '64eeab19479eee0008490f98', nome: 'Backing' },
@@ -152,10 +153,6 @@ export const DEFAULT_MEMBERS: Member[] = [
     'both',
     true
   ),
-  louveMember('6838e268acde4d79eabd6045', 'Nathaly Patricio', [
-    { id: '5f31e1d17803d600172af717', nome: 'Vocalista' },
-    { id: '64eeab19479eee0008490f98', nome: 'Backing' },
-  ]),
   louveMember(
     '64dc22c1356d5800088328d9',
     'Samuel Silva',
@@ -173,10 +170,6 @@ export const DEFAULT_MEMBERS: Member[] = [
     'both',
     true
   ),
-  louveMember('6853536dc01c8104d4cfd8e1', 'Solange Patrício', [
-    { id: '5f31e1d17803d600172af717', nome: 'Vocalista' },
-    { id: '64eeab19479eee0008490f98', nome: 'Backing' },
-  ]),
   louveMember(
     '660af79c2d05d1000775fc1e',
     'Tauyli Costa',
